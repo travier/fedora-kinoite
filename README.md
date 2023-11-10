@@ -11,9 +11,23 @@ This is an image of Fedora Kinoite with the following packages overlayed:
 - sysprof
 - vim, zsh, htop, distrobox
 
-How to rebase:
+## How to use
+
+Install Fedora Kinoite, then rebase to this image:
 
 ```
 $ rpm-ostree rebase ostree-unverified-image:registry:quay.io/travier/fedora-kinoite:latest
-
 ```
+
+Then update normally using `rpm-ostree update` or Discover (pending
+[rpm-ostree: Fix ostree container support](https://invent.kde.org/plasma/discover/-/merge_requests/591)).
+
+## To Do
+
+- Add signing using sigstore/cosign.
+
+## Warning notes
+
+- The images are not yet official Fedora images. The location will change.
+- The images are only available for x86_64 for now.
+- As the images are big, please be frugal with history/storage on quay.io.
