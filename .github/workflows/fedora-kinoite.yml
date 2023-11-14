@@ -38,7 +38,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.IMAGE_NAME }}
-          tags: latest ${{ github.sha }}
+          tags: latest
           containerfiles: Containerfile
           layers: false
           oci: true
@@ -51,4 +51,4 @@ jobs:
           password: ${{ secrets.BOT_SECRET }}
           image: ${{ env.IMAGE_NAME }}
           registry: ${{ env.REGISTRY }}
-          tags: latest ${{ github.sha }}
+          tags: latest

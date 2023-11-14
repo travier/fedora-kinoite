@@ -1,9 +1,6 @@
 # Location not final and subject to change!
 FROM quay.io/fedora-ostree-desktops/kinoite:39
 
-# Keep container image for ~2 months
-LABEL quay.expires-after=8w
-
 RUN rpm-ostree install \
         distrobox \
         htop \
