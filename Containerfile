@@ -1,6 +1,11 @@
 # Location not final and subject to change!
 FROM quay.io/fedora-ostree-desktops/kinoite:39
 
+LABEL org.opencontainers.image.title="Fedora Kinoite"
+LABEL org.opencontainers.image.description="Customized image of Fedora Kinoite"
+LABEL org.opencontainers.image.source="https://github.com/travier/fedora-kinoite"
+LABEL org.opencontainers.image.licenses="MIT"
+
 RUN rpm-ostree install \
         distrobox \
         htop \
