@@ -1,7 +1,7 @@
 name: "Build Fedora Kinoite image"
 
 env:
-  IMAGE_NAME: "fedora-kinoite"
+  NAME: "fedora-kinoite"
   REGISTRY: "quay.io/travier"
 
 on:
@@ -37,18 +37,18 @@ jobs:
       - name: Build container image
         uses: redhat-actions/buildah-build@v2
         with:
-          image: ${{ env.IMAGE_NAME }}
+          image: ${{ env.NAME }}
           tags: latest
           containerfiles: Containerfile
           layers: false
           oci: true
 
-      - name: Push to Quay.io
+      - name: Push to Container Registry
         uses: redhat-actions/push-to-registry@v2
         if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
         with:
           username: ${{ secrets.BOT_USERNAME }}
           password: ${{ secrets.BOT_SECRET }}
-          image: ${{ env.IMAGE_NAME }}
+          image: ${{ env.NAME }}
           registry: ${{ env.REGISTRY }}
           tags: latest
