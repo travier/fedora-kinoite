@@ -7,7 +7,7 @@ This is an image of Fedora Kinoite with the following packages overlayed:
   libvirt-daemon-driver-nwfilter libvirt-daemon-driver-qemu
   libvirt-daemon-driver-secret libvirt-daemon-driver-storage-core libvirt-dbus
   qemu-kvm)
-- iwd (a better wifi daemon than wpa_supplicant)
+- iwd (a better wifi daemon than `wpa_supplicant`)
 - sysprof
 - vim, zsh, htop, distrobox
 
@@ -53,8 +53,7 @@ $ rpm-ostree rebase ostree-image-signed:registry:quay.io/travier/fedora-kinoite:
 Then update normally using `rpm-ostree update` or Discover (pending
 [rpm-ostree: Fix ostree container support](https://invent.kde.org/plasma/discover/-/merge_requests/591)).
 
-## Warning notes
+## Important notes
 
-- The images are not yet official Fedora images. The location will change.
+- The base images are not yet official Fedora images. The location will change.
 - The images are only available for x86_64 for now.
-- As the images are big, please be frugal with history/storage on quay.io.
