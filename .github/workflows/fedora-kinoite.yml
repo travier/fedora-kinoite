@@ -45,6 +45,7 @@ jobs:
 
       - name: Push to Container Registry
         uses: redhat-actions/push-to-registry@v2
+        id: push
         if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
         with:
           username: ${{ secrets.BOT_USERNAME }}
@@ -52,3 +53,22 @@ jobs:
           image: ${{ env.NAME }}
           registry: ${{ env.REGISTRY }}
           tags: latest
+
+      - name: Login to Container Registry
+        uses: redhat-actions/podman-login@v1
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.BOT_USERNAME }}
+          password: ${{ secrets.BOT_SECRET }}
+
+      - uses: sigstore/cosign-installer@v3.2.0
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
+
+      - name: Sign container image
+        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/main'
+        run: |
+          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ env.REGISTRY }}/${{ env.NAME }}@${{ steps.push.outputs.digest }}
+        env:
+          COSIGN_EXPERIMENTAL: false
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
