@@ -13,18 +13,45 @@ This is an image of Fedora Kinoite with the following packages overlayed:
 
 ## How to use
 
-Install Fedora Kinoite, then rebase to this image:
+- Install Fedora Kinoite, update to the latest version and reboot.
+
+- Setup the key to validate container image signatures:
 
 ```
-$ rpm-ostree rebase ostree-unverified-image:registry:quay.io/travier/fedora-kinoite:latest
+$ sudo mkdir /etc/pki/containers
+$ sudo cp quay.io-travier-fedora-kinoite.pub /etc/pki/containers/
+$ sudo restorecon -RFv /etc/pki/containers
+
+$ cat /etc/containers/registries.d/quay.io-travier-fedora-kinoite.yaml
+docker:
+  quay.io/travier/fedora-kinoite:
+    use-sigstore-attachments: true
+$ sudo restorecon -RFv /etc/containers/registries.d/quay.io-travier-fedora-kinoite.yaml
+
+$ cat /etc/containers/policy.json
+...
+    "transports": {
+        "docker": {
+            "quay.io/travier/fedora-kinoite": [
+                {
+                    "type": "sigstoreSigned",
+                    "keyPath": "/etc/pki/containers/quay.io-travier-fedora-kinoite.pub",
+                    "signedIdentity": {
+                        "type": "matchRepository"
+                    }
+                }
+            ],
+...
+```
+
+- Then rebase to this image:
+
+```
+$ rpm-ostree rebase ostree-image-signed:registry:quay.io/travier/fedora-kinoite:latest
 ```
 
 Then update normally using `rpm-ostree update` or Discover (pending
 [rpm-ostree: Fix ostree container support](https://invent.kde.org/plasma/discover/-/merge_requests/591)).
-
-## To Do
-
-- Add signing using sigstore/cosign.
 
 ## Warning notes
 
