@@ -31,4 +31,7 @@ RUN rpm-ostree install \
 COPY usr usr
 COPY etc etc
 
+# Setup container signing policy
+RUN jq '.transports.docker["quay.io/travier/fedora-kinoite"] |= [{"type": "sigstoreSigned", "keyPath": "/etc/pki/containers/quay.io-travier-fedora-kinoite.pub", "signedIdentity": {"type": "matchRepository"}}]' | tee /etc/containers/policy.json
+
 RUN ostree container commit
