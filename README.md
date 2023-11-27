@@ -18,20 +18,25 @@ This is an image of Fedora Kinoite with the following packages overlayed:
 - Setup the key to validate container image signatures:
 
 ```
+# Install public key
 $ sudo mkdir /etc/pki/containers
 $ sudo cp quay.io-travier-fedora-kinoite.pub /etc/pki/containers/
 $ sudo restorecon -RFv /etc/pki/containers
 
+# Configure registry to get sigstore signatures
 $ cat /etc/containers/registries.d/quay.io-travier-fedora-kinoite.yaml
 docker:
   quay.io/travier/fedora-kinoite:
     use-sigstore-attachments: true
 $ sudo restorecon -RFv /etc/containers/registries.d/quay.io-travier-fedora-kinoite.yaml
 
+# Setup the policy
+$ jq '.transports.docker["quay.io/travier/fedora-kinoite"] |= [{"type": "sigstoreSigned", "keyPath": "/etc/pki/containers/quay.io-travier-fedora-kinoite.pub", "signedIdentity": {"type": "matchRepository"}}]' | sudo tee /etc/containers/policy.json
 $ cat /etc/containers/policy.json
 ...
     "transports": {
         "docker": {
+            ...
             "quay.io/travier/fedora-kinoite": [
                 {
                     "type": "sigstoreSigned",
@@ -41,6 +46,7 @@ $ cat /etc/containers/policy.json
                     }
                 }
             ],
+            ...
 ...
 ```
 
