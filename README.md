@@ -31,7 +31,9 @@ docker:
 $ sudo restorecon -RFv /etc/containers/registries.d/quay.io-travier-fedora-kinoite.yaml
 
 # Setup the policy
-$ jq '.transports.docker["quay.io/travier/fedora-kinoite"] |= [{"type": "sigstoreSigned", "keyPath": "/etc/pki/containers/quay.io-travier-fedora-kinoite.pub", "signedIdentity": {"type": "matchRepository"}}]' | sudo tee /etc/containers/policy.json
+$ cat /etc/containers/policy.json |\
+  jq '.transports.docker["quay.io/travier/fedora-kinoite"] |= [{"type": "sigstoreSigned", "keyPath": "/etc/pki/containers/quay.io-travier-fedora-kinoite.pub", "signedIdentity": {"type": "matchRepository"}}]' |\
+  sudo tee /etc/containers/policy.json
 $ cat /etc/containers/policy.json
 ...
     "transports": {
