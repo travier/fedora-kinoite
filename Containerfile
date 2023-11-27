@@ -27,7 +27,8 @@ RUN rpm-ostree install \
     systemctl enable libvirtd.socket && \
     rm -rf /var/lib/unbound/root.key
 
-# Copy custom config to /usr
+# Copy custom config to /usr & /etc
 COPY usr usr
+COPY etc etc
 
 RUN ostree container commit
