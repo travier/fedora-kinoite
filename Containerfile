@@ -24,7 +24,19 @@ RUN rpm-ostree install \
         vim \
         zsh \
     && \
-    systemctl enable libvirtd.socket && \
+    wget \
+        "https://kojipkgs.fedoraproject.org//work/tasks/6712/110246712/plasma-discover-5.27.9-2.fc39.x86_64.rpm" \
+        "https://kojipkgs.fedoraproject.org//work/tasks/6712/110246712/plasma-discover-flatpak-5.27.9-2.fc39.x86_64.rpm" \
+        "https://kojipkgs.fedoraproject.org//work/tasks/6712/110246712/plasma-discover-libs-5.27.9-2.fc39.x86_64.rpm" \
+        "https://kojipkgs.fedoraproject.org//work/tasks/6712/110246712/plasma-discover-notifier-5.27.9-2.fc39.x86_64.rpm" \
+        "https://kojipkgs.fedoraproject.org//work/tasks/6712/110246712/plasma-discover-rpm-ostree-5.27.9-2.fc39.x86_64.rpm" \
+    && \
+    rpm-ostree override replace ./plasma-discover-*.rpm \
+    && \
+    rm -v plasma-discover-*.rpm \
+    && \
+    systemctl enable libvirtd.socket \
+    && \
     rm -rf /var/lib/unbound/root.key
 
 # Copy custom config to /usr & /etc
