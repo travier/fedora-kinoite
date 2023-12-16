@@ -52,12 +52,15 @@ $ cat /etc/containers/policy.json
                 }
             ],
             ...
-        "": [
-          {
-            "type": "insecureAcceptAnything"
-          }
-        ]
-...
+            "": [
+                {
+                    "type": "insecureAcceptAnything"
+                }
+            ]
+        },
+        ...
+    }
+}
 ```
 
 - Then rebase to this image:
