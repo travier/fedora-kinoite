@@ -20,6 +20,7 @@ This is an image of Fedora Kinoite with the following packages overlayed:
 ```
 # Install public key
 $ sudo mkdir /etc/pki/containers
+$ curl -O "https://raw.githubusercontent.com/travier/fedora-kinoite/main/quay.io-travier-fedora-kinoite.pub"
 $ sudo cp quay.io-travier-fedora-kinoite.pub /etc/pki/containers/
 $ sudo restorecon -RFv /etc/pki/containers
 
