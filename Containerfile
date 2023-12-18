@@ -19,6 +19,7 @@ RUN rpm-ostree install \
         libvirt-daemon-driver-secret \
         libvirt-daemon-driver-storage-core \
         libvirt-dbus \
+        netcat \
         qemu-kvm \
         sysprof \
         vim \
