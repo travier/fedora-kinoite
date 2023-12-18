@@ -77,3 +77,7 @@ Then update normally using `rpm-ostree update` or Discover (pending
 
 - The base images are not yet official Fedora images. The location will change.
 - The images are only available for x86_64 for now.
+
+## License
+
+See [LICENSE](LICENSE) or [CC0](https://creativecommons.org/public-domain/cc0/).
