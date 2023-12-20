@@ -39,7 +39,8 @@ jobs:
         with:
           image: ${{ env.NAME }}
           tags: latest
-          containerfiles: Containerfile
+          containerfiles: ${{ env.NAME }}/Containerfile
+          context: ${{ env.NAME }}
           layers: false
           oci: true
 
