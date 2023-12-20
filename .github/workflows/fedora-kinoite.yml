@@ -8,13 +8,15 @@ on:
   pull_request:
     branches:
       - main
-    paths-ignore:
-      - 'README.md'
+    paths:
+      - 'fedora-kinoite/**'
+      - '.github/workflows/fedora-kinoite.yml'
   push:
     branches:
       - main
-    paths-ignore:
-      - 'README.md'
+    paths:
+      - 'fedora-kinoite/**'
+      - '.github/workflows/fedora-kinoite.yml'
   schedule:
     - cron: '0 4 * * *'
 
