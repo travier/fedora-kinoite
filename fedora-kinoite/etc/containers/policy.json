@@ -6,6 +6,15 @@
     ],
     "transports": {
         "docker": {
+            "quay.io/travier/fedora-kinoite": [
+                {
+                    "type": "sigstoreSigned",
+                    "keyPath": "/etc/pki/containers/quay.io-travier-fedora-kinoite.pub",
+                    "signedIdentity": {
+                        "type": "matchRepository"
+                    }
+                }
+            ],
             "registry.access.redhat.com": [
                 {
                     "type": "signedBy",
@@ -18,15 +27,6 @@
                     "type": "signedBy",
                     "keyType": "GPGKeys",
                     "keyPath": "/etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release"
-                }
-            ],
-            "quay.io/travier/fedora-kinoite": [
-                {
-                    "type": "sigstoreSigned",
-                    "keyPath": "/etc/pki/containers/quay.io-travier-fedora-kinoite.pub",
-                    "signedIdentity": {
-                        "type": "matchRepository"
-                    }
                 }
             ],
             "": [
