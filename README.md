@@ -70,8 +70,7 @@ $ cat /etc/containers/policy.json
 $ rpm-ostree rebase ostree-image-signed:registry:quay.io/travier/fedora-kinoite:latest
 ```
 
-Then update normally using `rpm-ostree update` or Discover (pending
-[rpm-ostree: Fix ostree container support](https://invent.kde.org/plasma/discover/-/merge_requests/591)).
+Then update normally using `rpm-ostree update` or Discover.
 
 ## Important notes
 
