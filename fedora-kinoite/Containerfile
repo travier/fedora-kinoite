@@ -1,3 +1,10 @@
+FROM registry.fedoraproject.org/fedora:39 AS builder
+
+RUN dnf update -y && \
+    dnf install -y rust cargo && \
+    cargo install bandwhich
+RUN mv /root/.cargo/bin/bandwhich /
+
 # Location not final and subject to change!
 FROM quay.io/fedora-ostree-desktops/kinoite:39
 
@@ -6,9 +13,15 @@ LABEL org.opencontainers.image.description="Customized image of Fedora Kinoite"
 LABEL org.opencontainers.image.source="https://github.com/travier/fedora-kinoite"
 LABEL org.opencontainers.image.licenses="MIT"
 
+# Copy bandwhich from builder container
+COPY --from=builder /bandwhich /usr/bin/bandwhich
+
 RUN rpm-ostree install \
+        bwm-ng \
         distrobox \
         htop \
+        igt-gpu-tools \
+        iotop \
         iwd \
         libvirt-daemon \
         libvirt-daemon-config-network \
@@ -23,6 +36,7 @@ RUN rpm-ostree install \
         qemu-kvm \
         sysprof \
         vim \
+        wireguard-tools \
         zsh \
     && \
     systemctl enable libvirtd.socket \
