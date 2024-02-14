@@ -23,6 +23,7 @@ RUN rpm-ostree install \
         igt-gpu-tools \
         iotop \
         iwd \
+        krb5-workstation \
         libvirt-daemon \
         libvirt-daemon-config-network \
         libvirt-daemon-driver-interface \
