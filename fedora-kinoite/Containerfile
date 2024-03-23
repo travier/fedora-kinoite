@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/fedora:39 AS builder
+FROM registry.fedoraproject.org/fedora:40 AS builder
 
 RUN dnf update -y && \
     dnf install -y rust cargo && \
@@ -6,7 +6,7 @@ RUN dnf update -y && \
 RUN mv /root/.cargo/bin/bandwhich /
 
 # Location not final and subject to change!
-FROM quay.io/fedora-ostree-desktops/kinoite:39
+FROM quay.io/fedora-ostree-desktops/kinoite:40
 
 LABEL org.opencontainers.image.title="Fedora Kinoite"
 LABEL org.opencontainers.image.description="Customized image of Fedora Kinoite"
