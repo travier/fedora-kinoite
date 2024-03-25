@@ -28,6 +28,7 @@ RUN rpm-ostree install \
         libvirt-daemon-config-network \
         libvirt-daemon-driver-interface \
         libvirt-daemon-driver-network \
+        libvirt-daemon-driver-nodedev \
         libvirt-daemon-driver-nwfilter \
         libvirt-daemon-driver-qemu \
         libvirt-daemon-driver-secret \
