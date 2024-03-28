@@ -19,6 +19,7 @@ on:
       - '.github/workflows/fedora-kinoite.yml'
   schedule:
     - cron: '0 4 * * *'
+  workflow_dispatch:
 
 permissions: read-all
 
