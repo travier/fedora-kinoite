@@ -41,17 +41,6 @@ RUN rpm-ostree install \
         wireguard-tools \
         zsh \
     && \
-    wget \
-        "https://kojipkgs.fedoraproject.org//work/tasks/9015/115339015/plasma-discover-6.0.2-2.fc40.x86_64.rpm" \
-        "https://kojipkgs.fedoraproject.org//work/tasks/9015/115339015/plasma-discover-flatpak-6.0.2-2.fc40.x86_64.rpm" \
-        "https://kojipkgs.fedoraproject.org//work/tasks/9015/115339015/plasma-discover-libs-6.0.2-2.fc40.x86_64.rpm" \
-        "https://kojipkgs.fedoraproject.org//work/tasks/9015/115339015/plasma-discover-notifier-6.0.2-2.fc40.x86_64.rpm" \
-        "https://kojipkgs.fedoraproject.org//work/tasks/9015/115339015/plasma-discover-rpm-ostree-6.0.2-2.fc40.x86_64.rpm" \
-    && \
-    rpm-ostree override replace ./plasma-discover-*.rpm \
-    && \
-    rm -v plasma-discover-*.rpm \
-    && \
     systemctl enable libvirtd.socket \
     && \
     rm -rf /var/lib/unbound/root.key
