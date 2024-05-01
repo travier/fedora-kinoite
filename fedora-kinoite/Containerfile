@@ -43,7 +43,8 @@ RUN rpm-ostree install \
         zsh \
     && \
     systemctl enable libvirtd.socket \
-        wget \
+    && \
+    wget \
         "https://siosm.fedorapeople.org/.rpms/rpm-ostree-2024.5-3.fc40.x86_64.rpm" \
         "https://siosm.fedorapeople.org/.rpms/rpm-ostree-libs-2024.5-3.fc40.x86_64.rpm" \
         "https://siosm.fedorapeople.org/.rpms/plasma-discover-6.0.4-2.fc40.x86_64.rpm" \
