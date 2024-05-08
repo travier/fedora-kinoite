@@ -54,7 +54,7 @@ jobs:
             version_derived="$(skopeo inspect docker://${REGISTRY}/${NAME} | jq -r '.Labels."org.opencontainers.image.version"')"
             if [[ "${version_base}" == "${version_derived}" ]]; then
               patch="${version_base##*\.}"
-              ((patch++))
+              ((patch++)) || true
               version="${version_base%\.*}.${patch}"
             fi
           fi
