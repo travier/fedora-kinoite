@@ -3,6 +3,7 @@ name: "Build Fedora Kinoite image"
 env:
   NAME: "fedora-kinoite"
   REGISTRY: "quay.io/travier"
+  BASEIMAGE: "quay.io/fedora-ostree-desktops/kinoite:40"
 
 on:
   pull_request:
@@ -45,11 +46,19 @@ jobs:
       - name: Figure out version
         id: version
         run: |
-          if [[ -z ${VERSION} ]]; then
-            version="$(skopeo inspect docker://${REGISTRY}/${NAME} | jq -r '.Labels."org.opencontainers.image.version"')"
-          else
+          set -exo pipefail
+          if [[ -n ${VERSION} ]]; then
             version="${VERSION}"
+          else
+            version_base="$(skopeo inspect docker://${BASEIMAGE} | jq -r '.Labels."org.opencontainers.image.version"')"
+            version_derived="$(skopeo inspect docker://${REGISTRY}/${NAME} | jq -r '.Labels."org.opencontainers.image.version"')"
+            if [[ "${version_base}" == "${version_derived}" ]]; then
+              patch="${version_base##*\.}"
+              ((patch++))
+              version="${version_base%\.*}.${patch}"
+            fi
           fi
+          echo "Using version: ${version}"
           echo "version=${version}" >> "$GITHUB_OUTPUT"
         env:
           VERSION: ${{ inputs.version }}
