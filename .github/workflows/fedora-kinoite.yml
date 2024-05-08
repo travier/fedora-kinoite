@@ -72,7 +72,9 @@ jobs:
           context: ${{ env.NAME }}
           layers: false
           oci: true
-          labels: org.opencontainers.image.version=${{ steps.version.output.version }}
+          labels: org.opencontainers.image.version=${{ env.VERSION }}
+        env:
+          VERSION: ${{ steps.version.output.version }}
 
       - name: Push to Container Registry
         uses: redhat-actions/push-to-registry@v2
