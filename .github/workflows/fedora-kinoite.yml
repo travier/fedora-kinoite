@@ -56,6 +56,8 @@ jobs:
               patch="${version_base##*\.}"
               ((patch++)) || true
               version="${version_base%\.*}.${patch}"
+            else
+              version="${version_base}"
             fi
           fi
           echo "Using version: ${version}"
