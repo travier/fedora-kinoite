@@ -20,6 +20,11 @@ on:
   schedule:
     - cron: '0 4 * * *'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Override version label (org.opencontainers.image.version)'
+        required: false
+        default: ''
 
 permissions: read-all
 
@@ -37,6 +42,18 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Figure out version
+        id: version
+        run: |
+          if [[ -z ${VERSION} ]]; then
+            version="$(skopeo inspect docker://${REGISTRY}/${NAME} | jq -r '.Labels."org.opencontainers.image.version"')"
+          else
+            version="${VERSION}"
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+        env:
+          VERSION: ${{ inputs.version }}
+
       - name: Build container image
         uses: redhat-actions/buildah-build@v2
         with:
@@ -46,6 +63,7 @@ jobs:
           context: ${{ env.NAME }}
           layers: false
           oci: true
+          labels: org.opencontainers.image.version=${{ steps.version.output.version }}
 
       - name: Push to Container Registry
         uses: redhat-actions/push-to-registry@v2
