@@ -1,0 +1,56 @@
+FROM quay.io/travier/kdedev:latest AS builder
+
+RUN dnf download \
+        dnf \
+        dnf-data \
+        dnf-plugins-core \
+        libcomps \
+        libdnf \
+        python3-dnf \
+        python3-dnf-plugins-core \
+        python3-hawkey \
+        python3-libcomps \
+        python3-libdnf \
+        python3-systemd \
+    ;
+    # && \
+    # dnf download \
+    #     desktop-backgrounds-compat \
+    #     f40-backgrounds-base \
+    #     f40-backgrounds-kde \
+    #     layer-shell-qt \
+    #     qt6-qtvirtualkeyboard \
+    #     sddm \
+    #     sddm-breeze \
+    #     sddm-wayland-plasma \
+    # ;
+
+# Location not final and subject to change!
+FROM quay.io/fedora-ostree-desktops/kinoite-devel:40
+
+LABEL org.opencontainers.image.title="Fedora Kinoite (Devel)"
+LABEL org.opencontainers.image.description="Fedora Kinoite (Development version)"
+LABEL org.opencontainers.image.source="https://github.com/travier/fedora-kinoite"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL quay.expires-after=""
+
+COPY --from=builder /*.rpm /
+RUN rm -rf *.i686.rpm && rpm -Uvh --force --nodeps *.rpm && rm -rf /*.rpm
+
+COPY usr usr
+
+RUN mkdir -p /usr/src/kde/ && ln -snf /usr /usr/src/kde/usr
+
+COPY plasmax11-dev6.desktop /usr/share/xsessions/plasmax11-dev6.desktop
+COPY plasmawayland-dev6.desktop /usr/share/wayland-sessions/plasmawayland-dev6.desktop
+COPY prefix.sh /usr/lib64/libexec/plasma-dev-prefix.sh
+COPY startplasma-dev.sh /usr/lib64/libexec/startplasma-dev.sh
+COPY 00-plasma.conf /etc/dbus-1/session.d/00-plasma.conf
+
+# COPY --from=builder /usr/src/kde/kdesrc-build /usr/kde/kdesrc-build
+# RUN ln -snf /usr/kde/kdesrc-build/kdesrc-build /usr/bin/kdesrc-build \
+#     && kdesrc-build --initial-setup
+
+# RUN sed -i "s/SELINUX=enforcing/SELINUX=permissive/" /etc/selinux/config
+
+RUN ostree container commit

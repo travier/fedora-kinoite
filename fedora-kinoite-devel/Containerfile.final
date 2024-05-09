@@ -1,0 +1,79 @@
+FROM quay.io/travier/kdedev:latest AS builder
+
+ADD kdesrc-buildrc /root/.config/kdesrc-buildrc
+
+# Missing:
+# - breeze-icon-theme
+# - kde-settings-pulseaudio
+RUN kdesrc-build \
+        ark \
+        audiocd-kio \
+        bluedevil \
+        breeze \
+        breeze-icons \
+        colord-kde \
+        discover \
+        dolphin \
+        drkonqi \
+        filelight \
+        flatpak-kcm \
+        kaccounts-integration \
+        kaccounts-providers \
+        kamera \
+        kate \
+        kcharselect \
+        kde-gtk-config \
+        kde-inotify-survey \
+        partitionmanager \
+        kdeconnect-kde \
+        kdegraphics-thumbnailers \
+        kdeplasma-addons \
+        kdialog \
+        kdnssd \
+        kfind \
+        khelpcenter \
+        kinfocenter \
+        kio-admin \
+        kio-gdrive \
+        kmenuedit \
+        kmousetool \
+        konsole \
+        kscreen \
+        kscreenlocker \
+        kwallet-pam \
+        kwalletmanager \
+        phonon-vlc \
+        plasma-desktop \
+        plasma-disks \
+        plasma-nm \
+        plasma-pa \
+        plasma-systemmonitor \
+        plasma-thunderbolt \
+        plasma-vault \
+        plasma-welcome \
+        plasma-workspace \
+        plasma-workspace-wallpapers \
+        polkit-kde-agent-1 \
+        print-manager \
+        sddm-kcm \
+        signon-kwallet-extension \
+        spectacle \
+        xwaylandvideobridge
+
+
+# Location not final and subject to change!
+FROM quay.io/fedora-ostree-desktops/kinoite-devel:40
+
+LABEL org.opencontainers.image.title="Fedora Kinoite (Devel)"
+LABEL org.opencontainers.image.description="Fedora Kinoite (Development version)"
+LABEL org.opencontainers.image.source="https://github.com/travier/fedora-kinoite"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL quay.expires-after=""
+
+COPY --from=builder /usr/src/kde/usr/* /usr/
+
+COPY --from=builder /usr/src/kde/kdesrc-build /usr/kde/kdesrc-build
+RUN ln -snf /usr/src/kde/kdesrc-build/kdesrc-build /usr/bin/kdesrc-build \
+    && kdesrc-build --initial-setup
+
+RUN ostree container commit
