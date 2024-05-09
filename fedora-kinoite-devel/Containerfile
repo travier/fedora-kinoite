@@ -1,0 +1,18 @@
+FROM quay.io/travier/kdedev:latest AS builder
+
+# Location not final and subject to change!
+FROM quay.io/fedora-ostree-desktops/kinoite-devel:40
+
+LABEL org.opencontainers.image.title="Fedora Kinoite (Devel)"
+LABEL org.opencontainers.image.description="Fedora Kinoite (Development version)"
+LABEL org.opencontainers.image.source="https://github.com/travier/fedora-kinoite"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL quay.expires-after=""
+
+COPY usr usr
+
+COPY --from=builder /usr/src/kde/kdesrc-build /usr/kde/kdesrc-build
+RUN ln -snf /usr/src/kde/kdesrc-build/kdesrc-build /usr/bin/kdesrc-build \
+    && kdesrc-build --initial-setup
+
+RUN ostree container commit
