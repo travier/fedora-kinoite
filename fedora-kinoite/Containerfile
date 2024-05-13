@@ -44,19 +44,6 @@ RUN rpm-ostree install \
     && \
     systemctl enable libvirtd.socket \
     && \
-    wget \
-        "https://siosm.fedorapeople.org/.rpms/rpm-ostree-2024.5-3.fc40.x86_64.rpm" \
-        "https://siosm.fedorapeople.org/.rpms/rpm-ostree-libs-2024.5-3.fc40.x86_64.rpm" \
-        "https://siosm.fedorapeople.org/.rpms/plasma-discover-6.0.4-2.fc40.x86_64.rpm" \
-        "https://siosm.fedorapeople.org/.rpms/plasma-discover-flatpak-6.0.4-2.fc40.x86_64.rpm" \
-        "https://siosm.fedorapeople.org/.rpms/plasma-discover-libs-6.0.4-2.fc40.x86_64.rpm" \
-        "https://siosm.fedorapeople.org/.rpms/plasma-discover-notifier-6.0.4-2.fc40.x86_64.rpm" \
-        "https://siosm.fedorapeople.org/.rpms/plasma-discover-rpm-ostree-6.0.4-2.fc40.x86_64.rpm" \
-    && \
-    rpm-ostree override replace ./*.rpm \
-    && \
-    rm -v ./*.rpm \
-    && \
     rm -rf /var/lib/unbound/root.key
 
 # Copy custom config to /usr & /etc
