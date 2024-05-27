@@ -1,0 +1,78 @@
+name: "Build bandwhich container image"
+
+env:
+  NAME: "bandwhich"
+  REGISTRY: "quay.io/travier"
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'bandwhich/**'
+      - '.github/workflows/bandwhich.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'bandwhich/**'
+      - '.github/workflows/bandwhich.yml'
+  schedule:
+    - cron: '0 0 * * MON'
+  workflow_dispatch:
+
+permissions: read-all
+
+# Prevent multiple workflow runs from racing to ensure that pushes are made
+# sequentialy for the main branch. Also cancel in progress workflow runs for
+# pull requests only.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-push-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Build container image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.NAME }}
+          tags: latest
+          containerfiles: ${{ env.NAME }}/Containerfile
+          context: ${{ env.NAME }}
+          layers: false
+          oci: true
+
+      - name: Push to Container Registry
+        uses: redhat-actions/push-to-registry@v2
+        id: push
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        with:
+          username: ${{ secrets.BOT_USERNAME }}
+          password: ${{ secrets.BOT_SECRET }}
+          image: ${{ env.NAME }}
+          registry: ${{ env.REGISTRY }}
+          tags: latest
+
+      - name: Login to Container Registry
+        uses: redhat-actions/podman-login@v1
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.BOT_USERNAME }}
+          password: ${{ secrets.BOT_SECRET }}
+
+      - uses: sigstore/cosign-installer@v3.5.0
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+
+      - name: Sign container image
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        run: |
+          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ env.REGISTRY }}/${{ env.NAME }}@${{ steps.push.outputs.digest }}
+        env:
+          COSIGN_EXPERIMENTAL: false
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
