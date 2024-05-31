@@ -9,7 +9,6 @@ LABEL quay.expires-after=""
 
 # Missing anaconda-tools
 RUN rpm-ostree install \
-        livesys-scripts-tools \
         anaconda \
         anaconda-install-env-deps \
         anaconda-live \
