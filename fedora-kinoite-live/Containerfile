@@ -1,0 +1,21 @@
+# Location not final and subject to change!
+FROM quay.io/fedora-ostree-desktops/kinoite:rawhide
+
+LABEL org.opencontainers.image.title="Fedora Kinoite"
+LABEL org.opencontainers.image.description="Fedora Kinoite Live ISO"
+LABEL org.opencontainers.image.source="https://github.com/travier/fedora-kinoite"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL quay.expires-after=""
+
+# Missing anaconda-tools
+RUN rpm-ostree install \
+        livesys-scripts-tools \
+        anaconda \
+        anaconda-install-env-deps \
+        anaconda-live \
+    && \
+    systemctl enable livesys.service livesys-late.service \
+    && \
+    sed -i 's/^livesys_session=.*/livesys_session="kde"/' /etc/sysconfig/livesys \
+    && \
+    ostree container commit
