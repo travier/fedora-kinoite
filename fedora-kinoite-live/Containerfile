@@ -12,6 +12,7 @@ RUN rpm-ostree install \
         anaconda \
         anaconda-install-env-deps \
         anaconda-live \
+        livesys-scripts \
     && \
     systemctl enable livesys.service livesys-late.service \
     && \
