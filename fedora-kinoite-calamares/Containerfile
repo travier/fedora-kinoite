@@ -1,0 +1,18 @@
+# Location not final and subject to change!
+FROM quay.io/fedora-ostree-desktops/kinoite:40
+
+LABEL org.opencontainers.image.title="Fedora Kinoite Calamares"
+LABEL org.opencontainers.image.description="Fedora Kinoite Calamares (First Boot)"
+LABEL org.opencontainers.image.source="https://github.com/travier/fedora-kinoite"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL quay.expires-after=""
+
+ADD group_asahi-fedora-remix-scripts.repo /etc/yum.repos.d/
+ADD group_asahi-fedora-remix-scripts.gpg /etc/pki/rpm-gpg/RPM-GPG-KEY-group_asahi-fedora-remix-scripts
+
+RUN rpm-ostree install \
+        calamares-firstboot-config \
+    && \
+    systemctl enable calamares-firstboot.service \
+    && \
+    ostree container commit
