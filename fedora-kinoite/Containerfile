@@ -12,6 +12,8 @@ LABEL quay.expires-after=""
 # Copy bandwhich from builder container
 COPY --from=bandwhich /usr/bin/bandwhich /usr/bin/bandwhich
 
+RUN rpm-ostree install dnf && dnf -y swap noopenh264 openh264
+
 RUN rpm-ostree install \
         bwm-ng \
         distrobox \
