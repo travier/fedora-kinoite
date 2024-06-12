@@ -12,7 +12,9 @@ LABEL quay.expires-after=""
 # Copy bandwhich from builder container
 COPY --from=bandwhich /usr/bin/bandwhich /usr/bin/bandwhich
 
-RUN rpm-ostree install \
+RUN rpm-ostree override remove noopenh264 --install openh264 \
+    && \
+    rpm-ostree install \
         bwm-ng \
         distrobox \
         htop \
