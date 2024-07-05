@@ -21,7 +21,7 @@ COPY --from=bandwhich /usr/bin/bandwhich /usr/bin/bandwhich
 RUN rpm-ostree override remove noopenh264 --install openh264 \
     && \
     rpm-ostree override remove ostree-grub2 && \
-    echo -n "[composefs]\nenabled=yes\n" >> /usr/lib/ostree/prepare-root.conf && \
+    echo -e "[composefs]\nenabled=yes" >> /usr/lib/ostree/prepare-root.conf && \
     export KERNEL_VERSION="$(rpm -qa kernel --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}')" && \
     stock_arguments=$(lsinitrd "/lib/modules/${KERNEL_VERSION}/initramfs.img"  | grep '^Arguments: ' | sed 's/^Arguments: //') && \
     mkdir -p /tmp/dracut /var/roothome && \
