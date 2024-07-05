@@ -9,10 +9,28 @@ LABEL org.opencontainers.image.source="https://github.com/travier/fedora-kinoite
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL quay.expires-after=""
 
-# Copy bandwhich from builder container
+# Copy bandwhich from bandwhich container
 COPY --from=bandwhich /usr/bin/bandwhich /usr/bin/bandwhich
 
+# - Replace noopenh264 with openh264
+# - Remove ostree-grub2, setup composefs, rebuild initramfs
+# - Install bootupd and generate metadata
+# - Install various packages
+# - Enable libvirtd
+# - Misc /var cleanup
 RUN rpm-ostree override remove noopenh264 --install openh264 \
+    && \
+    rpm-ostree override remove ostree-grub2 && \
+    echo -n "[composefs]\nenabled=yes\n" >> /usr/lib/ostree/prepare-root.conf && \
+    export KERNEL_VERSION="$(rpm -qa kernel --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}')" && \
+    stock_arguments=$(lsinitrd "/lib/modules/${KERNEL_VERSION}/initramfs.img"  | grep '^Arguments: ' | sed 's/^Arguments: //') && \
+    mkdir -p /tmp/dracut /var/roothome && \
+    bash <(/usr/bin/echo "dracut $stock_arguments") && \
+    rm -rf /var/* /tmp/*  && \
+    mv -v /boot/initramfs*.img "/lib/modules/${KERNEL_VERSION}/initramfs.img" \
+    && \
+    rpm-ostree install bootupd && \
+    /usr/bin/bootupctl backend generate-update-metadata \
     && \
     rpm-ostree install \
         bwm-ng \
