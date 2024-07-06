@@ -78,16 +78,16 @@ jobs:
           oci: true
           labels: org.opencontainers.image.version=${{ steps.version.outputs.version }}
 
-      - name: Push to Container Registry
-        uses: redhat-actions/push-to-registry@v2
-        id: push
-        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+      - name: Build testing container image
+        uses: redhat-actions/buildah-build@v2
         with:
-          username: ${{ secrets.BOT_USERNAME }}
-          password: ${{ secrets.BOT_SECRET }}
           image: ${{ env.NAME }}
-          registry: ${{ env.REGISTRY }}
-          tags: latest
+          tags: testing
+          containerfiles: ${{ env.NAME }}/Containerfile.testing
+          context: ${{ env.NAME }}
+          layers: false
+          oci: true
+          labels: org.opencontainers.image.version=${{ steps.version.outputs.version }}
 
       - name: Login to Container Registry
         uses: redhat-actions/podman-login@v1
@@ -100,6 +100,17 @@ jobs:
       - uses: sigstore/cosign-installer@v3.5.0
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
 
+      - name: Push to Container Registry
+        uses: redhat-actions/push-to-registry@v2
+        id: push
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        with:
+          username: ${{ secrets.BOT_USERNAME }}
+          password: ${{ secrets.BOT_SECRET }}
+          image: ${{ env.NAME }}
+          registry: ${{ env.REGISTRY }}
+          tags: latest
+
       - name: Sign container image
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         run: |
@@ -107,17 +118,6 @@ jobs:
         env:
           COSIGN_EXPERIMENTAL: false
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
-
-      - name: Build testing container image
-        uses: redhat-actions/buildah-build@v2
-        with:
-          image: ${{ env.NAME }}
-          tags: testing
-          containerfiles: ${{ env.NAME }}/Containerfile.testing
-          context: ${{ env.NAME }}
-          layers: false
-          oci: true
-          labels: org.opencontainers.image.version=${{ steps.version.outputs.version }}
 
       - name: Push testing to Container Registry
         uses: redhat-actions/push-to-registry@v2
