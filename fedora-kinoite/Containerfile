@@ -16,7 +16,8 @@ COPY --from=bandwhich /usr/bin/bandwhich /usr/bin/bandwhich
 # - Install various packages
 # - Enable libvirtd
 # - Misc /var cleanup
-RUN rpm-ostree override remove noopenh264 --install openh264 \
+RUN rpm-ostree override remove noopenh264 --install openh264 && \
+    sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/fedora-cisco-openh264.repo \
     && \
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/rpmfusion-nonfree-steam.repo && \
     rpm-ostree install steam-devices && \
