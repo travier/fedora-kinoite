@@ -18,7 +18,7 @@ Kinoite with the following packages overlayed:
 
 and the following default configuration:
 
-- iwd set as default wifi daemon, replacing` wpa_supplicant`
+- iwd set as default wifi daemon, replacing `wpa_supplicant`
 - NetworkManager configured to only use keyfiles
 - container policy set to verify those container images and toolbox images
 
