@@ -12,6 +12,10 @@ LABEL quay.expires-after=""
 # Copy bandwhich from bandwhich container
 COPY --from=bandwhich /usr/bin/bandwhich /usr/bin/bandwhich
 
+# Copy custom config to /usr & /etc
+COPY usr usr
+COPY etc etc
+
 # - Replace noopenh264 with openh264
 # - Install various packages
 # - Enable libvirtd
@@ -52,10 +56,5 @@ RUN rpm-ostree override remove noopenh264 --install openh264 && \
     && \
     rm -rf /var/lib/unbound/root.key \
     && \
-    rpm-ostree cleanup --repomd
-
-# Copy custom config to /usr & /etc
-COPY usr usr
-COPY etc etc
-
-RUN ostree container commit
+    rpm-ostree cleanup --repomd && \
+    ostree container commit
