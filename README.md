@@ -1,6 +1,10 @@
-# Custom Fedora Kinoite image with overlayed packages
+# Custom Fedora Kinoite images
 
-This is an image of Fedora Kinoite with the following packages overlayed:
+This repository hosts Containerfiles and GitHub workflows to create custom
+Fedora Kinoite images for my own use.
+
+This main image (`fedora-kinoite:latest`) is based on Fedora Kinoite with the
+following packages overlayed:
 
 - libvirtd (libvirt-daemon libvirt-daemon-config-network
   libvirt-daemon-driver-interface libvirt-daemon-driver-network
@@ -10,6 +14,10 @@ This is an image of Fedora Kinoite with the following packages overlayed:
 - iwd (a better wifi daemon than `wpa_supplicant`)
 - sysprof
 - vim, zsh, htop, distrobox
+- steam-devices for Steam Input
+
+The others images are currently used for testing various in progress changes
+for Fedora Kinoite.
 
 ## How to use
 

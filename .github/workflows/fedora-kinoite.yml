@@ -107,3 +107,33 @@ jobs:
         env:
           COSIGN_EXPERIMENTAL: false
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+
+      - name: Build testing container image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.NAME }}
+          tags: testing
+          containerfiles: ${{ env.NAME }}/Containerfile.testing
+          context: ${{ env.NAME }}
+          layers: false
+          oci: true
+          labels: org.opencontainers.image.version=${{ steps.version.outputs.version }}
+
+      - name: Push testing to Container Registry
+        uses: redhat-actions/push-to-registry@v2
+        id: push-testing
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        with:
+          username: ${{ secrets.BOT_USERNAME }}
+          password: ${{ secrets.BOT_SECRET }}
+          image: ${{ env.NAME }}
+          registry: ${{ env.REGISTRY }}
+          tags: testing
+
+      - name: Sign testing container image
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        run: |
+          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ env.REGISTRY }}/${{ env.NAME }}@${{ steps.push-testing.outputs.digest }}
+        env:
+          COSIGN_EXPERIMENTAL: false
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}

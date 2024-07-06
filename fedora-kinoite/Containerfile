@@ -13,24 +13,10 @@ LABEL quay.expires-after=""
 COPY --from=bandwhich /usr/bin/bandwhich /usr/bin/bandwhich
 
 # - Replace noopenh264 with openh264
-# - Remove ostree-grub2, setup composefs, rebuild initramfs
-# - Install bootupd and generate metadata
 # - Install various packages
 # - Enable libvirtd
 # - Misc /var cleanup
 RUN rpm-ostree override remove noopenh264 --install openh264 \
-    && \
-    rpm-ostree override remove ostree-grub2 && \
-    echo -e "[composefs]\nenabled=yes" >> /usr/lib/ostree/prepare-root.conf && \
-    export KERNEL_VERSION="$(rpm -qa kernel --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}')" && \
-    stock_arguments=$(lsinitrd "/lib/modules/${KERNEL_VERSION}/initramfs.img"  | grep '^Arguments: ' | sed 's/^Arguments: //') && \
-    mkdir -p /tmp/dracut /var/roothome && \
-    bash <(/usr/bin/echo "dracut $stock_arguments") && \
-    rm -rf /var/* /tmp/*  && \
-    mv -v /boot/initramfs*.img "/lib/modules/${KERNEL_VERSION}/initramfs.img" \
-    && \
-    rpm-ostree install bootupd && \
-    /usr/bin/bootupctl backend generate-update-metadata \
     && \
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/rpmfusion-nonfree-steam.repo && \
     rpm-ostree install steam-devices && \
@@ -63,7 +49,9 @@ RUN rpm-ostree override remove noopenh264 --install openh264 \
     && \
     systemctl enable libvirtd.socket \
     && \
-    rm -rf /var/lib/unbound/root.key
+    rm -rf /var/lib/unbound/root.key \
+    && \
+    rpm-ostree cleanup --repomd
 
 # Copy custom config to /usr & /etc
 COPY usr usr
