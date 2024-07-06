@@ -15,6 +15,38 @@
                     }
                 }
             ],
+            "quay.io/travier": [
+                {
+                    "type": "sigstoreSigned",
+                    "keyPath": "/etc/pki/containers/quay.io-travier-containers.pub",
+                    "signedIdentity": {
+                        "type": "matchRepository"
+                    }
+                }
+            ],
+            "quay.io/toolbx-images": [
+                {
+                    "type": "sigstoreSigned",
+                    "keyPath": "/etc/pki/containers/quay.io-toolbx-images.pub",
+                    "signedIdentity": {
+                        "type": "matchRepository"
+                    }
+                }
+            ],
+            "ghcr.io/travier": [
+                {
+                    "type": "sigstoreSigned",
+                    "fulcio": {
+                        "caPath": "/etc/pki/containers/fulcio_v1.crt.pem",
+                        "oidcIssuer": "https://token.actions.githubusercontent.com",
+                        "subjectEmail": "https://github.com/travier/cosign-test/.github/workflows/cosign-keyless.yml@refs/heads/main"
+                    },
+                    "rekorPublicKeyPath": "/etc/pki/containers/rekor.pub",
+                    "signedIdentity": {
+                        "type": "matchRepository"
+                    }
+                }
+            ],
             "registry.access.redhat.com": [
                 {
                     "type": "signedBy",
@@ -35,7 +67,28 @@
                 }
             ]
         },
+        "containers-storage": {
+            "": [
+                {
+                    "type": "insecureAcceptAnything"
+                }
+            ]
+        },
         "docker-daemon": {
+            "": [
+                {
+                    "type": "insecureAcceptAnything"
+                }
+            ]
+        },
+        "oci": {
+            "": [
+                {
+                    "type": "insecureAcceptAnything"
+                }
+            ]
+        },
+        "oci-archive": {
             "": [
                 {
                     "type": "insecureAcceptAnything"
