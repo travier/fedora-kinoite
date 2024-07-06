@@ -32,6 +32,10 @@ RUN rpm-ostree override remove noopenh264 --install openh264 \
     rpm-ostree install bootupd && \
     /usr/bin/bootupctl backend generate-update-metadata \
     && \
+    sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/rpmfusion-nonfree-steam.repo && \
+    rpm-ostree install steam-devices && \
+    sed -i '0,/enabled=1/s//enabled=0/' /etc/yum.repos.d/rpmfusion-nonfree-steam.repo \
+    && \
     rpm-ostree install \
         bwm-ng \
         distrobox \
