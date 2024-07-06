@@ -87,7 +87,6 @@ jobs:
           context: ${{ env.NAME }}
           layers: false
           oci: true
-          labels: org.opencontainers.image.version=${{ steps.version.outputs.version }}
 
       - name: Login to Container Registry
         uses: redhat-actions/podman-login@v1
