@@ -109,6 +109,9 @@ jobs:
           image: ${{ env.NAME }}
           registry: ${{ env.REGISTRY }}
           tags: latest
+          extra-args: |
+            --compression-format=zstd:chunked
+            --compression-level=19
 
       - name: Sign container image
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
@@ -128,6 +131,9 @@ jobs:
           image: ${{ env.NAME }}
           registry: ${{ env.REGISTRY }}
           tags: testing
+          extra-args: |
+            --compression-format=zstd:chunked
+            --compression-level=19
 
       - name: Sign testing container image
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
