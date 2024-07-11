@@ -3,7 +3,7 @@
 This repository hosts Containerfiles and GitHub workflows to create custom
 Fedora Kinoite images for my own usage.
 
-The main image (`quai.io/travier/fedora-kinoite:latest`) is based on Fedora
+The main image (`quay.io/travier/fedora-kinoite:latest`) is based on Fedora
 Kinoite with the following packages overlayed:
 
 - libvirtd (libvirt-daemon libvirt-daemon-config-network
