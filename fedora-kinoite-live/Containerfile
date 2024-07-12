@@ -1,5 +1,5 @@
 # Location not final and subject to change!
-FROM quay.io/fedora-ostree-desktops/kinoite:rawhide
+FROM quay.io/fedora-ostree-desktops/kinoite:40
 
 LABEL org.opencontainers.image.title="Fedora Kinoite"
 LABEL org.opencontainers.image.description="Fedora Kinoite Live ISO"
@@ -7,13 +7,28 @@ LABEL org.opencontainers.image.source="https://github.com/travier/fedora-kinoite
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL quay.expires-after=""
 
-# Missing anaconda-tools
+# - Install Anaconda installer
+# - Install GRUB cdboot bootloader
+# - Install and enable livesys-scripts to start a live KDE session on boot
+# - Install dracut-live dracut module for LiveISO support
+# - Rebuild initramfs with LiveISO support
 RUN rpm-ostree install \
         anaconda \
         anaconda-install-env-deps \
         anaconda-live \
+        dracut-live \
         grub2-efi-x64-cdboot \
         livesys-scripts \
+    && \
+    install -dm 0755 -o 0 -g 0 /usr/lib/dracut/dracut.conf.d && \
+    echo -e "# Add Live ISO (squashfs image) support\nadd_dracutmodules+=\" dmsquash-live \"" > /usr/lib/dracut/dracut.conf.d/20-atomic-liveiso.conf \
+    && \
+    export KERNEL_VERSION="$(rpm -qa kernel --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}')" && \
+    stock_arguments=$(lsinitrd "/lib/modules/${KERNEL_VERSION}/initramfs.img"  | grep '^Arguments: ' | sed 's/^Arguments: //') && \
+    mkdir -p /tmp/dracut /var/roothome && \
+    bash <(/usr/bin/echo "dracut $stock_arguments") && \
+    rm -rf /var/* /tmp/*  && \
+    mv -v /boot/initramfs*.img "/lib/modules/${KERNEL_VERSION}/initramfs.img" \
     && \
     systemctl enable livesys.service livesys-late.service \
     && \
