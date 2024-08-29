@@ -83,7 +83,7 @@ jobs:
         with:
           image: ${{ env.NAME }}
           tags: testing
-          containerfiles: ${{ env.NAME }}/Containerfile.testing
+          containerfiles: ${{ env.NAME }}/Containerfile.testing.f41
           context: ${{ env.NAME }}
           layers: false
           oci: true
