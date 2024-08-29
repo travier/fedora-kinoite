@@ -11,8 +11,4 @@ RUN rpm-ostree override remove ostree-grub2 && \
     rm -rf /var/* /tmp/*  && \
     mv -v /boot/initramfs*.img "/lib/modules/${KERNEL_VERSION}/initramfs.img" \
     && \
-    rpm-ostree install bootupd && \
-    /usr/bin/bootupctl backend generate-update-metadata \
-    && \
-    rpm-ostree cleanup --repomd && \
     ostree container commit
