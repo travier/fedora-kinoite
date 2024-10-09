@@ -11,15 +11,10 @@ Kinoite with the following packages overlayed:
   libvirt-daemon-driver-nwfilter libvirt-daemon-driver-qemu
   libvirt-daemon-driver-secret libvirt-daemon-driver-storage-core libvirt-dbus
   qemu-kvm)
-- iwd (a better wifi daemon than `wpa_supplicant`)
-- sysprof
-- vim, zsh, htop, distrobox
-- steam-devices for Steam Input (works with Steam Flatpak)
+- vim, zsh
 
 and the following default configuration:
 
-- iwd set as default wifi daemon, replacing `wpa_supplicant`
-- NetworkManager configured to only use keyfiles
 - container policy set to verify those container images and toolbox images
 
 The others images are currently used for testing various in progress changes

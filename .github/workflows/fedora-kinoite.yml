@@ -78,26 +78,6 @@ jobs:
           oci: true
           labels: org.opencontainers.image.version=${{ steps.version.outputs.version }}
 
-      - name: Build testing container image
-        uses: redhat-actions/buildah-build@v2
-        with:
-          image: ${{ env.NAME }}
-          tags: testing
-          containerfiles: ${{ env.NAME }}/Containerfile.testing
-          context: ${{ env.NAME }}
-          layers: false
-          oci: true
-
-      - name: Build testing container image (F41)
-        uses: redhat-actions/buildah-build@v2
-        with:
-          image: ${{ env.NAME }}
-          tags: testing.f41
-          containerfiles: ${{ env.NAME }}/Containerfile.testing.f41
-          context: ${{ env.NAME }}
-          layers: false
-          oci: true
-
       - name: Login to Container Registry
         uses: redhat-actions/podman-login@v1
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
@@ -127,50 +107,6 @@ jobs:
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         run: |
           cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ env.REGISTRY }}/${{ env.NAME }}@${{ steps.push.outputs.digest }}
-        env:
-          COSIGN_EXPERIMENTAL: false
-          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
-
-      - name: Push testing to Container Registry
-        uses: redhat-actions/push-to-registry@v2
-        id: push-testing
-        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
-        with:
-          username: ${{ secrets.BOT_USERNAME }}
-          password: ${{ secrets.BOT_SECRET }}
-          image: ${{ env.NAME }}
-          registry: ${{ env.REGISTRY }}
-          tags: testing
-          extra-args: |
-            --compression-format=zstd:chunked
-            --compression-level=19
-
-      - name: Sign testing container image
-        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
-        run: |
-          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ env.REGISTRY }}/${{ env.NAME }}@${{ steps.push-testing.outputs.digest }}
-        env:
-          COSIGN_EXPERIMENTAL: false
-          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
-
-      - name: Push testing (F41) to Container Registry
-        uses: redhat-actions/push-to-registry@v2
-        id: push-testing-f41
-        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
-        with:
-          username: ${{ secrets.BOT_USERNAME }}
-          password: ${{ secrets.BOT_SECRET }}
-          image: ${{ env.NAME }}
-          registry: ${{ env.REGISTRY }}
-          tags: testing.f41
-          extra-args: |
-            --compression-format=zstd:chunked
-            --compression-level=19
-
-      - name: Sign testing (F41) container image
-        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
-        run: |
-          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ env.REGISTRY }}/${{ env.NAME }}@${{ steps.push-testing-f41.outputs.digest }}
         env:
           COSIGN_EXPERIMENTAL: false
           COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}

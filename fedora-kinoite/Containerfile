@@ -1,5 +1,3 @@
-FROM quay.io/travier/bandwhich:latest AS bandwhich
-
 # Location not final and subject to change!
 FROM quay.io/fedora-ostree-desktops/kinoite:40
 
@@ -9,33 +7,17 @@ LABEL org.opencontainers.image.source="https://github.com/travier/fedora-kinoite
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL quay.expires-after=""
 
-# Copy bandwhich from bandwhich container
-COPY --from=bandwhich /usr/bin/bandwhich /usr/bin/bandwhich
-
-# Copy custom config to /usr & /etc
-COPY usr usr
+# Copy custom config to /etc
 COPY etc etc
 
 # - Replace noopenh264 with openh264
-# - Install various packages
 # - Enable libvirtd
 # - Misc /var cleanup
 # - Remove SetUID/SetGID bits
 RUN rpm-ostree override remove noopenh264 --install openh264 && \
     sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/fedora-cisco-openh264.repo \
     && \
-    sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/rpmfusion-nonfree-steam.repo && \
-    rpm-ostree install steam-devices && \
-    sed -i '0,/enabled=1/s//enabled=0/' /etc/yum.repos.d/rpmfusion-nonfree-steam.repo \
-    && \
     rpm-ostree install \
-        bwm-ng \
-        distrobox \
-        htop \
-        igt-gpu-tools \
-        iotop \
-        iwd \
-        krb5-workstation \
         libvirt-daemon \
         libvirt-daemon-config-network \
         libvirt-daemon-driver-interface \
@@ -48,9 +30,7 @@ RUN rpm-ostree override remove noopenh264 --install openh264 && \
         libvirt-dbus \
         netcat \
         qemu-kvm \
-        sysprof \
         vim \
-        wireguard-tools \
         zsh \
     && \
     systemctl enable libvirtd.socket \
