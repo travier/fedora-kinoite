@@ -42,7 +42,6 @@ RUN rpm-ostree override remove noopenh264 --install openh264 && \
         /usr/bin/chfn \
         /usr/bin/chsh \
         /usr/bin/gpasswd \
-        /usr/bin/ksu \
         /usr/bin/newgrp \
         /usr/bin/passwd \
         /usr/bin/vmware-user-suid-wrapper \
