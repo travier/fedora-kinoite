@@ -1,5 +1,5 @@
 # Location not final and subject to change!
-FROM quay.io/fedora-ostree-desktops/kinoite:40
+FROM quay.io/fedora-ostree-desktops/kinoite:41
 
 LABEL org.opencontainers.image.title="Fedora Kinoite"
 LABEL org.opencontainers.image.description="Fedora Kinoite Live ISO"
