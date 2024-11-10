@@ -67,6 +67,14 @@ jobs:
         env:
           VERSION: ${{ inputs.version }}
 
+      - name: Get kmod signing key
+        run: |
+          echo "${KMOD_KEY}" > key
+          echo "${KMOD_CERT}" | base64 --decode > cert
+        env:
+          KMOD_KEY: ${{ secrets.KMOD_KEY }}
+          KMOD_CERT: ${{ secrets.KMOD_CERT }}
+
       - name: Build container image
         uses: redhat-actions/buildah-build@v2
         with:
@@ -77,6 +85,9 @@ jobs:
           layers: false
           oci: true
           labels: org.opencontainers.image.version=${{ steps.version.outputs.version }}
+          extra-args: |
+            --secret=id=key,src=key
+            --secret=id=cert,src=cert
 
       - name: Login to Container Registry
         uses: redhat-actions/podman-login@v1
