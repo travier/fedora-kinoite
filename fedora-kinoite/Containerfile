@@ -72,8 +72,6 @@ RUN --mount=type=secret,id=cert \
         libvirt-dbus \
         netcat \
         qemu-kvm \
-        vim \
-        zsh \
     && \
     systemctl enable libvirtd.socket \
     && \
