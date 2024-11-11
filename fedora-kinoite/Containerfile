@@ -36,8 +36,6 @@ COPY --from=builder /extra /usr/lib/modules/extra
 
 # - Setup xpadneo kernel module
 # - Replace noopenh264 with openh264
-# - Enable libvirtd
-# - Misc /var cleanup
 # - Remove SetUID/SetGID bits
 RUN --mount=type=secret,id=cert \
     KERNEL="$(rpm -q "kernel" --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}')" ; \
@@ -58,24 +56,6 @@ RUN --mount=type=secret,id=cert \
     sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/rpmfusion-nonfree-steam.repo && \
     dnf install -y steam-devices && \
     sed -i '0,/enabled=1/s//enabled=0/' /etc/yum.repos.d/rpmfusion-nonfree-steam.repo \
-    && \
-    dnf install -y \
-        libvirt-daemon \
-        libvirt-daemon-config-network \
-        libvirt-daemon-driver-interface \
-        libvirt-daemon-driver-network \
-        libvirt-daemon-driver-nodedev \
-        libvirt-daemon-driver-nwfilter \
-        libvirt-daemon-driver-qemu \
-        libvirt-daemon-driver-secret \
-        libvirt-daemon-driver-storage-core \
-        libvirt-dbus \
-        netcat \
-        qemu-kvm \
-    && \
-    systemctl enable libvirtd.socket \
-    && \
-    rm -rf /var/lib/unbound/root.key \
     && \
     chmod ug-s \
         /usr/bin/chage \
