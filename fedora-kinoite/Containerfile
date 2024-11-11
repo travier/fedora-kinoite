@@ -1,6 +1,7 @@
 # Location not final and subject to change!
 FROM quay.io/fedora-ostree-desktops/kinoite:41 as builder
 
+# Build xpadneo kernel module
 RUN --mount=type=secret,id=key \
     --mount=type=secret,id=cert \
     curl --silent --location \
@@ -33,18 +34,23 @@ LABEL quay.expires-after=""
 COPY etc etc
 COPY --from=builder /extra /usr/lib/modules/extra
 
+# - Setup xpadneo kernel module
 # - Replace noopenh264 with openh264
 # - Enable libvirtd
 # - Misc /var cleanup
 # - Remove SetUID/SetGID bits
 RUN --mount=type=secret,id=cert \
+    KERNEL="$(rpm -q "kernel" --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}')" ; \
+    mv /usr/lib/modules/extra /usr/lib/modules/${KERNEL}/extra && \
+    depmod --all ${KERNEL} && \
+    install -Dm644 /run/secrets/cert /etc/pki/akmods/certs/public_key.der && \
     curl --silent --location \
         --output /etc/yum.repos.d/negativo17-fedora-multimedia.repo \
         https://negativo17.org/repos/fedora-multimedia.repo && \
-    KERNEL="$(rpm -q "kernel" --queryformat '%{VERSION}-%{RELEASE}.%{ARCH}')" ; \
-    mkdir -p /etc/pki/akmods/certs/ && \
-    cp /run/secrets/cert /etc/pki/akmods/certs/public_key.der && \
-    ln -snf /usr/lib/modules/extra /usr/lib/modules/${KERNEL}/extra \
+    dnf download xpadneo-kmod-common && \
+    rpm --install --verbose --hash --noscript --nodeps ./xpadneo-kmod-common*.rpm && \
+    rm ./xpadneo-kmod-common*.rpm && \
+    sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/negativo17-fedora-multimedia.repo \
     && \
     dnf swap -y noopenh264 openh264 && \
     sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/fedora-cisco-openh264.repo \
