@@ -111,7 +111,7 @@ jobs:
           registry: ${{ env.REGISTRY }}
           tags: latest
           extra-args: |
-            --compression-format=zstd:chunked
+            --compression-format=zstd
             --compression-level=19
 
       - name: Sign container image
