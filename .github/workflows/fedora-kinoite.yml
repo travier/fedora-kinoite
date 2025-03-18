@@ -39,7 +39,15 @@ concurrency:
 jobs:
   build-push-image:
     runs-on: ubuntu-24.04
+    container:
+      image: quay.io/travier/podman-action
+      options: --privileged
     steps:
+      - name: Install tools
+        run: |
+          set -euxo pipefail
+          dnf install -y git-core jq
+
       - name: Checkout repo
         uses: actions/checkout@v4
 
