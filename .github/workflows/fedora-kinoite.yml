@@ -46,7 +46,9 @@ jobs:
       - name: Install tools
         run: |
           set -euxo pipefail
-          dnf install -y git-core jq
+          dnf install -y git-core jq rpm-ostree
+          dnf upgrade -y --enablerepo=updates-testing --refresh --advisory=FEDORA-2025-4b9488bb4d
+          rpm-ostree experimental compose build-chunked-oci -h
 
       - name: Checkout repo
         uses: actions/checkout@v4
@@ -87,7 +89,7 @@ jobs:
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.NAME }}
-          tags: latest
+          tags: latest-build
           containerfiles: ${{ env.NAME }}/Containerfile
           context: ${{ env.NAME }}
           layers: false
@@ -96,6 +98,13 @@ jobs:
           extra-args: |
             --secret=id=key,src=key
             --secret=id=cert,src=cert
+
+      - name: Rechunk container image
+        run: |
+          rpm-ostree experimental compose build-chunked-oci \
+            --bootc --format-version=1 \
+            --from localhost/${NAME}:latest-build \
+            --output containers-storage:localhost/${NAME}:latest
 
       - name: Login to Container Registry
         uses: redhat-actions/podman-login@v1
