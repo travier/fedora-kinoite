@@ -41,14 +41,20 @@ jobs:
     runs-on: ubuntu-24.04
     container:
       image: quay.io/travier/podman-action
-      options: --privileged
+      options: "--security-opt=label=disable --privileged --user 0:0 --device=/dev/kvm --device=/dev/fuse --volume /:/run/host:rw --volume /var/run/docker.sock:/var/run/docker.sock"
     steps:
+      - name: Reclaim disk space
+        run: |
+          dnf install -y moby-engine
+          docker image prune --all --force
+          rm -rf "/run/host/usr/local/lib/android"
+          dnf remove -y moby-engine
+
       - name: Install tools
         run: |
           set -euxo pipefail
           dnf install -y git-core jq rpm-ostree
           dnf upgrade -y --enablerepo=updates-testing --refresh --advisory=FEDORA-2025-4b9488bb4d
-          rpm-ostree experimental compose build-chunked-oci -h
 
       - name: Checkout repo
         uses: actions/checkout@v4
