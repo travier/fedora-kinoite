@@ -56,9 +56,7 @@ rm ./xpadneo-kmod-common*.rpm
 sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/negativo17-fedora-multimedia.repo
 dnf install -y openh264 mozilla-openh264
 sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/fedora-cisco-openh264.repo
-sed -i '0,/enabled=0/s//enabled=1/' /etc/yum.repos.d/rpmfusion-nonfree-steam.repo
 dnf install -y steam-devices
-sed -i '0,/enabled=1/s//enabled=0/' /etc/yum.repos.d/rpmfusion-nonfree-steam.repo
 chmod ug-s \
     /usr/bin/chage \
     /usr/bin/chfn \
