@@ -50,6 +50,19 @@ jobs:
           rm -rf "/run/host/usr/local/lib/android"
           dnf remove -y moby-engine
 
+      - name: Fixup GitHub homedir
+        run: |
+          mkdir -p /github/home/.docker/
+
+      - name: Login to Container Registry
+        uses: redhat-actions/podman-login@v1
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.BOT_USERNAME }}
+          password: ${{ secrets.BOT_SECRET }}
+          auth_file_path: /tmp/auth.json
+
       - name: Install tools
         run: |
           set -euxo pipefail
@@ -111,14 +124,6 @@ jobs:
             --bootc --format-version=1 \
             --from localhost/${NAME}:latest-build \
             --output containers-storage:localhost/${NAME}:latest
-
-      - name: Login to Container Registry
-        uses: redhat-actions/podman-login@v1
-        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.BOT_USERNAME }}
-          password: ${{ secrets.BOT_SECRET }}
 
       - uses: sigstore/cosign-installer@v3.8.1
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
