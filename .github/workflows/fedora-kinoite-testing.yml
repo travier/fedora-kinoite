@@ -48,9 +48,6 @@ jobs:
         run: |
           set -euxo pipefail
           rm -rf "/run/host/usr/local/lib/android"
-          # dnf install -y moby-engine
-          # docker image prune --all --force
-          # dnf remove -y moby-engine
 
       - name: Fixup GitHub homedir
         run: |
