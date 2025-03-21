@@ -1,0 +1,171 @@
+name: "Build Fedora Kinoite 42 image"
+
+env:
+  NAME: "fedora-kinoite"
+  REGISTRY: "quay.io/travier"
+  BASEIMAGE: "quay.io/fedora-ostree-desktops/kinoite:42"
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'fedora-kinoite/**'
+      - '.github/workflows/fedora-kinoite-testing.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'fedora-kinoite/**'
+      - '.github/workflows/fedora-kinoite-testing.yml'
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Override version label (org.opencontainers.image.version)'
+        required: false
+        default: ''
+
+permissions: read-all
+
+# Prevent multiple workflow runs from racing to ensure that pushes are made
+# sequentialy for the main branch. Also cancel in progress workflow runs for
+# pull requests only.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-push-image:
+    runs-on: ubuntu-24.04
+    container:
+      image: quay.io/travier/podman-action
+      options: "--security-opt=label=disable --privileged --user 0:0 --device=/dev/kvm --device=/dev/fuse --volume /:/run/host:rw --volume /var/run/docker.sock:/var/run/docker.sock"
+    steps:
+      - name: Reclaim disk space
+        run: |
+          set -euxo pipefail
+          rm -rf "/run/host/usr/local/lib/android"
+          # dnf install -y moby-engine
+          # docker image prune --all --force
+          # dnf remove -y moby-engine
+
+      - name: Fixup GitHub homedir
+        run: |
+          mkdir -p /github/home/.docker/
+
+      - name: Login to Container Registry
+        uses: redhat-actions/podman-login@v1
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.BOT_USERNAME }}
+          password: ${{ secrets.BOT_SECRET }}
+          auth_file_path: /tmp/auth.json
+
+      - name: Install tools
+        run: |
+          set -euxo pipefail
+          dnf install -y git-core jq rpm-ostree
+          dnf upgrade -y --enablerepo=updates-testing --refresh --advisory=FEDORA-2025-4b9488bb4d
+
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Figure out version
+        id: version
+        run: |
+          set -exo pipefail
+          if [[ -n ${VERSION} ]]; then
+            version="${VERSION}"
+          else
+            version_base="$(skopeo inspect docker://${BASEIMAGE} | jq -r '.Labels."org.opencontainers.image.version"')"
+            version_derived="$(skopeo inspect docker://${REGISTRY}/${NAME}:testing | jq -r '.Labels."org.opencontainers.image.version"' || true)"
+            if [[ -z "${version_derived}" ]]; then
+              version="${version_base}"
+            elif [[ "${version_base}" == "${version_derived}" ]]; then
+              patch="${version_base##*\.}"
+              ((patch++)) || true
+              version="${version_base%\.*}.${patch}"
+            else
+              version="${version_base}"
+            fi
+          fi
+          echo "Using version: ${version}"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+        env:
+          VERSION: ${{ inputs.version }}
+
+      - name: Get kmod signing key
+        run: |
+          echo "${KMOD_KEY}" > key
+          echo "${KMOD_CERT}" | base64 --decode > cert
+        env:
+          KMOD_KEY: ${{ secrets.KMOD_KEY }}
+          KMOD_CERT: ${{ secrets.KMOD_CERT }}
+
+      - name: Build container image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.NAME }}
+          tags: build.testing
+          containerfiles: ${{ env.NAME }}/Containerfile.testing
+          context: ${{ env.NAME }}
+          layers: false
+          oci: true
+          extra-args: |
+            --secret=id=key,src=key
+            --secret=id=cert,src=cert
+
+      - name: Rechunk container image
+        run: |
+          rpm-ostree experimental compose build-chunked-oci \
+            --bootc --format-version=1 \
+            --from localhost/${NAME}:build.testing \
+            --output containers-storage:localhost/${NAME}:rechunked.testing
+
+      - name: Write NOP Containerfile
+        run: |
+          echo "FROM localhost/${NAME}:rechunked.testing" > ${NAME}/Containerfile.testing.labels
+
+      - name: Add labels to container image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.NAME }}
+          tags: testing
+          containerfiles: ${{ env.NAME }}/Containerfile.testing.labels
+          context: ${{ env.NAME }}
+          layers: false
+          oci: true
+          labels:
+            org.opencontainers.image.version="${{ steps.version.outputs.version }}"
+            org.opencontainers.image.title="Fedora Kinoite"
+            org.opencontainers.image.description="Customized image of Fedora Kinoite"
+            org.opencontainers.image.source="https://github.com/travier/fedora-kinoite"
+            org.opencontainers.image.licenses="MIT"
+
+      - uses: sigstore/cosign-installer@v3.8.1
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+
+      - name: Push to Container Registry
+        uses: redhat-actions/push-to-registry@v2
+        id: push
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        with:
+          username: ${{ secrets.BOT_USERNAME }}
+          password: ${{ secrets.BOT_SECRET }}
+          image: ${{ env.NAME }}
+          registry: ${{ env.REGISTRY }}
+          tags: testing
+          extra-args: |
+            --compression-format=zstd
+            --compression-level=19
+
+      - name: Sign container image
+        if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        run: |
+          cosign sign -y --key env://COSIGN_PRIVATE_KEY ${{ env.REGISTRY }}/${{ env.NAME }}@${{ steps.push.outputs.digest }}
+        env:
+          COSIGN_EXPERIMENTAL: false
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
