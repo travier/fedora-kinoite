@@ -136,7 +136,7 @@ jobs:
           context: ${{ env.NAME }}
           layers: false
           oci: true
-          labels:
+          labels: |
             org.opencontainers.image.version="${{ steps.version.outputs.version }}"
             org.opencontainers.image.title="Fedora Kinoite"
             org.opencontainers.image.description="Customized image of Fedora Kinoite"
