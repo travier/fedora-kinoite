@@ -137,11 +137,11 @@ jobs:
           layers: false
           oci: true
           labels: |
-            org.opencontainers.image.version="${{ steps.version.outputs.version }}"
-            org.opencontainers.image.title="Fedora Kinoite"
-            org.opencontainers.image.description="Customized image of Fedora Kinoite"
-            org.opencontainers.image.source="https://github.com/travier/fedora-kinoite"
-            org.opencontainers.image.licenses="MIT"
+            org.opencontainers.image.version=${{ steps.version.outputs.version }}
+            org.opencontainers.image.title=Fedora Kinoite
+            org.opencontainers.image.description=Customized image of Fedora Kinoite
+            org.opencontainers.image.source=https://github.com/travier/fedora-kinoite
+            org.opencontainers.image.licenses=MIT
 
       - uses: sigstore/cosign-installer@v3.8.1
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
