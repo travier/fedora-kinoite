@@ -6,20 +6,20 @@ env:
   BASEIMAGE: "quay.io/fedora-ostree-desktops/kinoite:42"
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'fedora-kinoite/**'
-      - '.github/workflows/fedora-kinoite-testing.yml'
-  push:
-    branches:
-      - main
-    paths:
-      - 'fedora-kinoite/**'
-      - '.github/workflows/fedora-kinoite-testing.yml'
-  schedule:
-    - cron: '0 4 * * *'
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'fedora-kinoite/**'
+  #     - '.github/workflows/fedora-kinoite-testing.yml'
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'fedora-kinoite/**'
+  #     - '.github/workflows/fedora-kinoite-testing.yml'
+  # schedule:
+  #   - cron: '0 4 * * *'
   workflow_dispatch:
     inputs:
       version:

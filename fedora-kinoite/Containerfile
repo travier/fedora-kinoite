@@ -1,5 +1,5 @@
 # Location not final and subject to change!
-FROM quay.io/fedora-ostree-desktops/kinoite:41 as builder
+FROM quay.io/fedora-ostree-desktops/kinoite:42 as builder
 
 # Build xpadneo kernel module
 RUN --mount=type=secret,id=key \
@@ -25,7 +25,7 @@ cp -a /usr/lib/modules/${KERNEL}/extra/ /extra
 EORUN
 
 # Location not final and subject to change!
-FROM quay.io/fedora-ostree-desktops/kinoite:41
+FROM quay.io/fedora-ostree-desktops/kinoite:42
 
 LABEL org.opencontainers.image.title="Fedora Kinoite"
 LABEL org.opencontainers.image.description="Customized image of Fedora Kinoite"
