@@ -3,19 +3,23 @@
 This repository hosts Containerfiles and GitHub workflows to create custom
 Fedora Kinoite images for my own usage.
 
-The main image (`quay.io/travier/fedora-kinoite:latest`) is based on Fedora
-Kinoite with the following packages overlayed:
+The main image (`fedora-kinoite`, pushed to
+`quay.io/travier/fedora-kinoite:latest`) is based on Fedora Kinoite Bootable
+Container images with the following changes:
 
-- libvirtd (libvirt-daemon libvirt-daemon-config-network
-  libvirt-daemon-driver-interface libvirt-daemon-driver-network
-  libvirt-daemon-driver-nwfilter libvirt-daemon-driver-qemu
-  libvirt-daemon-driver-secret libvirt-daemon-driver-storage-core libvirt-dbus
-  qemu-kvm)
-- vim, zsh
+- [xpadneo](https://atar-axis.github.io/xpadneo/) out of tree kernel module for
+  Xbox Wireless Controller support. The kmod are packaged by
+  [negativo17](https://negativo17.org) and signed with a MOK user key (public
+  key included in the image).
+- Default `/etc/containers/policy.json` config to setup signature verification
+  for those images and other containers from my namespace on
+  [quay.io](https://quay.io/user/travier/).
+- `openh264` and `mozilla-openh264` installed by default.
+- `steam-devices` installed by default but Steam Input support.
+- SetUID bit removed from selected binaires.
 
-and the following default configuration:
-
-- container policy set to verify those container images and toolbox images
+This images used to include other packages, that I have now moved to
+[systemd system extensions](https://github.com/travier/fedora-sysexts) instead.
 
 The others images are currently used for testing various in progress changes
 for Fedora Kinoite.
@@ -84,7 +88,7 @@ Then update normally using `rpm-ostree update` or Discover.
 ## Important notes
 
 - The base images are not yet official Fedora images. The location will change.
-- The images are only available for x86_64 for now.
+- The images are only available for `x86_64` for now.
 
 ## License
 
