@@ -3,7 +3,7 @@ name: "Build Fedora Kinoite image"
 env:
   NAME: "fedora-kinoite"
   REGISTRY: "quay.io/travier"
-  BASEIMAGE: "quay.io/fedora-ostree-desktops/kinoite:41"
+  BASEIMAGE: "quay.io/fedora-ostree-desktops/kinoite:42"
 
 on:
   pull_request:
