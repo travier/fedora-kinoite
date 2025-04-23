@@ -120,6 +120,7 @@ jobs:
         run: |
           rpm-ostree experimental compose build-chunked-oci \
             --bootc --format-version=1 \
+            --max-layers 96 \
             --from localhost/${NAME}:build \
             --output containers-storage:localhost/${NAME}:rechunked
 
