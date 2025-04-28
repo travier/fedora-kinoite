@@ -143,7 +143,7 @@ jobs:
             org.opencontainers.image.source=https://github.com/travier/fedora-kinoite
             org.opencontainers.image.licenses=MIT
 
-      - uses: sigstore/cosign-installer@v3.8.1
+      - uses: sigstore/cosign-installer@v3.8.2
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
 
       - name: Push to Container Registry
