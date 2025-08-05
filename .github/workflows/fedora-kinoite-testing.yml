@@ -1,4 +1,4 @@
-name: "Build Fedora Kinoite 42 image"
+name: "Build Fedora Kinoite 42 image (testing)"
 
 env:
   NAME: "fedora-kinoite"

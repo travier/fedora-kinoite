@@ -6,18 +6,18 @@ env:
   BASEIMAGE: "quay.io/fedora-ostree-desktops/kinoite:rawhide"
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'fedora-kinoite-calamares/**'
-      - '.github/workflows/fedora-kinoite-calamares.yml'
-  push:
-    branches:
-      - main
-    paths:
-      - 'fedora-kinoite-calamares/**'
-      - '.github/workflows/fedora-kinoite-calamares.yml'
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'fedora-kinoite-calamares/**'
+  #     - '.github/workflows/fedora-kinoite-calamares.yml'
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'fedora-kinoite-calamares/**'
+  #     - '.github/workflows/fedora-kinoite-calamares.yml'
   # schedule:
   #   - cron: '0 4 * * *'
   workflow_dispatch:

@@ -6,18 +6,18 @@ env:
   BASEIMAGE: "quay.io/fedora-ostree-desktops/kinoite:rawhide"
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'fedora-kinoite-live/**'
-      - '.github/workflows/fedora-kinoite-live.yml'
-  push:
-    branches:
-      - main
-    paths:
-      - 'fedora-kinoite-live/**'
-      - '.github/workflows/fedora-kinoite-live.yml'
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'fedora-kinoite-live/**'
+  #     - '.github/workflows/fedora-kinoite-live.yml'
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'fedora-kinoite-live/**'
+  #     - '.github/workflows/fedora-kinoite-live.yml'
   # schedule:
   #   - cron: '0 4 * * *'
   workflow_dispatch:
