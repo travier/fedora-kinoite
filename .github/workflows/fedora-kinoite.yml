@@ -68,7 +68,7 @@ jobs:
           dnf install -y git-core jq rpm-ostree
 
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Figure out version
         id: version
