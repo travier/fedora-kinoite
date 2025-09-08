@@ -1,25 +1,25 @@
-name: "Build Fedora Kinoite 42 image (testing)"
+name: "Build Fedora Kinoite 43 image (testing)"
 
 env:
   NAME: "fedora-kinoite"
   REGISTRY: "quay.io/travier"
-  BASEIMAGE: "quay.io/fedora-ostree-desktops/kinoite:42"
+  BASEIMAGE: "quay.io/fedora-ostree-desktops/kinoite:43"
 
 on:
-  # pull_request:
-  #   branches:
-  #     - main
-  #   paths:
-  #     - 'fedora-kinoite/**'
-  #     - '.github/workflows/fedora-kinoite-testing.yml'
-  # push:
-  #   branches:
-  #     - main
-  #   paths:
-  #     - 'fedora-kinoite/**'
-  #     - '.github/workflows/fedora-kinoite-testing.yml'
-  # schedule:
-  #   - cron: '0 4 * * *'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'fedora-kinoite/**'
+      - '.github/workflows/fedora-kinoite-testing.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'fedora-kinoite/**'
+      - '.github/workflows/fedora-kinoite-testing.yml'
+  schedule:
+    - cron: '0 4 * * *'
   workflow_dispatch:
     inputs:
       version:
@@ -94,53 +94,15 @@ jobs:
         env:
           VERSION: ${{ inputs.version }}
 
-      - name: Get kmod signing key
-        run: |
-          echo "${KMOD_KEY}" > key
-          echo "${KMOD_CERT}" | base64 --decode > cert
-        env:
-          KMOD_KEY: ${{ secrets.KMOD_KEY }}
-          KMOD_CERT: ${{ secrets.KMOD_CERT }}
-
       - name: Build container image
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.NAME }}
-          tags: build.testing
+          tags: testing
           containerfiles: ${{ env.NAME }}/Containerfile.testing
           context: ${{ env.NAME }}
           layers: false
           oci: true
-          extra-args: |
-            --secret=id=key,src=key
-            --secret=id=cert,src=cert
-
-      - name: Rechunk container image
-        run: |
-          rpm-ostree experimental compose build-chunked-oci \
-            --bootc --format-version=1 \
-            --from localhost/${NAME}:build.testing \
-            --output containers-storage:localhost/${NAME}:rechunked.testing
-
-      - name: Write NOP Containerfile
-        run: |
-          echo "FROM localhost/${NAME}:rechunked.testing" > ${NAME}/Containerfile.testing.labels
-
-      - name: Add labels to container image
-        uses: redhat-actions/buildah-build@v2
-        with:
-          image: ${{ env.NAME }}
-          tags: testing
-          containerfiles: ${{ env.NAME }}/Containerfile.testing.labels
-          context: ${{ env.NAME }}
-          layers: false
-          oci: true
-          labels: |
-            org.opencontainers.image.version=${{ steps.version.outputs.version }}
-            org.opencontainers.image.title=Fedora Kinoite
-            org.opencontainers.image.description=Customized image of Fedora Kinoite
-            org.opencontainers.image.source=https://github.com/travier/fedora-kinoite
-            org.opencontainers.image.licenses=MIT
 
       - uses: sigstore/cosign-installer@v3.9.2
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
@@ -155,9 +117,9 @@ jobs:
           image: ${{ env.NAME }}
           registry: ${{ env.REGISTRY }}
           tags: testing
-          extra-args: |
-            --compression-format=zstd
-            --compression-level=19
+          # extra-args: |
+          #   --compression-format=zstd
+          #   --compression-level=19
 
       - name: Sign container image
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
