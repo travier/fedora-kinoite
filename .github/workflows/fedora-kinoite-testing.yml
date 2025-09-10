@@ -65,7 +65,7 @@ jobs:
       - name: Install tools
         run: |
           set -euxo pipefail
-          dnf install -y git-core jq rpm-ostree
+          dnf install -y git-core jq
 
       - name: Checkout repo
         uses: actions/checkout@v5

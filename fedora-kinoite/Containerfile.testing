@@ -11,8 +11,7 @@ LABEL quay.expires-after=""
 COPY etc etc
 
 # - Remove SetUID/SetGID bits
-RUN --mount=type=secret,id=cert \
-    <<EORUN
+RUN <<EORUN
 set -xeuo pipefail
 chmod ug-s \
     /usr/bin/chage \
