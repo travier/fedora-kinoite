@@ -22,6 +22,5 @@ chmod ug-s \
     /usr/bin/newgrp \
     /usr/bin/passwd \
     /usr/bin/vmware-user-suid-wrapper
-dnf clean all
 bootc container lint
 EORUN
