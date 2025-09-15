@@ -104,7 +104,7 @@ jobs:
           layers: false
           oci: true
 
-      - uses: sigstore/cosign-installer@v3.9.2
+      - uses: sigstore/cosign-installer@v3.10.0
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
 
       - name: Push to Container Registry
