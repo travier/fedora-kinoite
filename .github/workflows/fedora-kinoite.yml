@@ -3,7 +3,8 @@ name: "Build Fedora Kinoite image"
 env:
   NAME: "fedora-kinoite"
   REGISTRY: "quay.io/travier"
-  BASEIMAGE: "quay.io/fedora-ostree-desktops/kinoite:42"
+  BASEIMAGE: "quay.io/fedora-ostree-desktops/kinoite:43"
+  TAG: "latest"
 
 on:
   pull_request:
@@ -65,7 +66,7 @@ jobs:
       - name: Install tools
         run: |
           set -euxo pipefail
-          dnf install -y git-core jq rpm-ostree
+          dnf install -y git-core jq
 
       - name: Checkout repo
         uses: actions/checkout@v5
@@ -78,7 +79,7 @@ jobs:
             version="${VERSION}"
           else
             version_base="$(skopeo inspect docker://${BASEIMAGE} | jq -r '.Labels."org.opencontainers.image.version"')"
-            version_derived="$(skopeo inspect docker://${REGISTRY}/${NAME} | jq -r '.Labels."org.opencontainers.image.version"' || true)"
+            version_derived="$(skopeo inspect docker://${REGISTRY}/${NAME}:${TAG} | jq -r '.Labels."org.opencontainers.image.version"' || true)"
             if [[ -z "${version_derived}" ]]; then
               version="${version_base}"
             elif [[ "${version_base}" == "${version_derived}" ]]; then
@@ -93,55 +94,17 @@ jobs:
           echo "version=${version}" >> "$GITHUB_OUTPUT"
         env:
           VERSION: ${{ inputs.version }}
-
-      - name: Get kmod signing key
-        run: |
-          echo "${KMOD_KEY}" > key
-          echo "${KMOD_CERT}" | base64 --decode > cert
-        env:
-          KMOD_KEY: ${{ secrets.KMOD_KEY }}
-          KMOD_CERT: ${{ secrets.KMOD_CERT }}
+          TAG: ${{ env.TAG }}
 
       - name: Build container image
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.NAME }}
-          tags: build
+          tags: ${{ env.TAG }}
           containerfiles: ${{ env.NAME }}/Containerfile
           context: ${{ env.NAME }}
           layers: false
           oci: true
-          extra-args: |
-            --secret=id=key,src=key
-            --secret=id=cert,src=cert
-
-      - name: Rechunk container image
-        run: |
-          rpm-ostree experimental compose build-chunked-oci \
-            --bootc --format-version=1 \
-            --max-layers 96 \
-            --from localhost/${NAME}:build \
-            --output containers-storage:localhost/${NAME}:rechunked
-
-      - name: Write NOP Containerfile
-        run: |
-          echo "FROM localhost/${NAME}:rechunked" > ${NAME}/Containerfile.labels
-
-      - name: Add labels to container image
-        uses: redhat-actions/buildah-build@v2
-        with:
-          image: ${{ env.NAME }}
-          tags: latest
-          containerfiles: ${{ env.NAME }}/Containerfile.labels
-          context: ${{ env.NAME }}
-          layers: false
-          oci: true
-          labels: |
-            org.opencontainers.image.version=${{ steps.version.outputs.version }}
-            org.opencontainers.image.title=Fedora Kinoite
-            org.opencontainers.image.description=Customized image of Fedora Kinoite
-            org.opencontainers.image.source=https://github.com/travier/fedora-kinoite
-            org.opencontainers.image.licenses=MIT
 
       - uses: sigstore/cosign-installer@v3.10.0
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
@@ -155,7 +118,7 @@ jobs:
           password: ${{ secrets.BOT_SECRET }}
           image: ${{ env.NAME }}
           registry: ${{ env.REGISTRY }}
-          tags: latest
+          tags: ${{ env.TAG }}
           extra-args: |
             --compression-format=zstd
 

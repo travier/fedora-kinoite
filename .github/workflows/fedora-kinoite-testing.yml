@@ -4,22 +4,23 @@ env:
   NAME: "fedora-kinoite"
   REGISTRY: "quay.io/travier"
   BASEIMAGE: "quay.io/fedora-ostree-desktops/kinoite:43"
+  TAG: "testing"
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'fedora-kinoite/**'
-      - '.github/workflows/fedora-kinoite-testing.yml'
-  push:
-    branches:
-      - main
-    paths:
-      - 'fedora-kinoite/**'
-      - '.github/workflows/fedora-kinoite-testing.yml'
-  schedule:
-    - cron: '0 4 * * *'
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'fedora-kinoite/**'
+  #     - '.github/workflows/fedora-kinoite-testing.yml'
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'fedora-kinoite/**'
+  #     - '.github/workflows/fedora-kinoite-testing.yml'
+  # schedule:
+  #   - cron: '0 4 * * *'
   workflow_dispatch:
     inputs:
       version:
@@ -78,7 +79,7 @@ jobs:
             version="${VERSION}"
           else
             version_base="$(skopeo inspect docker://${BASEIMAGE} | jq -r '.Labels."org.opencontainers.image.version"')"
-            version_derived="$(skopeo inspect docker://${REGISTRY}/${NAME}:testing | jq -r '.Labels."org.opencontainers.image.version"' || true)"
+            version_derived="$(skopeo inspect docker://${REGISTRY}/${NAME}:${TAG} | jq -r '.Labels."org.opencontainers.image.version"' || true)"
             if [[ -z "${version_derived}" ]]; then
               version="${version_base}"
             elif [[ "${version_base}" == "${version_derived}" ]]; then
@@ -93,12 +94,13 @@ jobs:
           echo "version=${version}" >> "$GITHUB_OUTPUT"
         env:
           VERSION: ${{ inputs.version }}
+          TAG: ${{ env.TAG }}
 
       - name: Build container image
         uses: redhat-actions/buildah-build@v2
         with:
           image: ${{ env.NAME }}
-          tags: testing
+          tags: ${{ env.TAG }}
           containerfiles: ${{ env.NAME }}/Containerfile.testing
           context: ${{ env.NAME }}
           layers: false
@@ -116,7 +118,7 @@ jobs:
           password: ${{ secrets.BOT_SECRET }}
           image: ${{ env.NAME }}
           registry: ${{ env.REGISTRY }}
-          tags: testing
+          tags: ${{ env.TAG }}
           # extra-args: |
           #   --compression-format=zstd
           #   --compression-level=19
