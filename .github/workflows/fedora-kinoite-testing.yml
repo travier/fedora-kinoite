@@ -69,7 +69,7 @@ jobs:
           dnf install -y git-core jq
 
       - name: Checkout repo
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Figure out version
         id: version
