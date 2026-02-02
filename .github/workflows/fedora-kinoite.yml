@@ -20,7 +20,7 @@ on:
       - 'fedora-kinoite/**'
       - '.github/workflows/fedora-kinoite.yml'
   schedule:
-    - cron: '0 4 * * *'
+    - cron: '0 4 * * MON'
   workflow_dispatch:
     inputs:
       version:
