@@ -1,26 +1,26 @@
-name: "Build Fedora Kinoite 43 image (testing)"
+name: "Build Fedora Kinoite image (testing)"
 
 env:
   NAME: "fedora-kinoite"
   REGISTRY: "quay.io/travier"
-  BASEIMAGE: "quay.io/fedora-ostree-desktops/kinoite:43"
+  BASEIMAGE: "quay.io/fedora-ostree-desktops/kinoite:44"
   TAG: "testing"
 
 on:
-  # pull_request:
-  #   branches:
-  #     - main
-  #   paths:
-  #     - 'fedora-kinoite/**'
-  #     - '.github/workflows/fedora-kinoite-testing.yml'
-  # push:
-  #   branches:
-  #     - main
-  #   paths:
-  #     - 'fedora-kinoite/**'
-  #     - '.github/workflows/fedora-kinoite-testing.yml'
-  # schedule:
-  #   - cron: '0 4 * * *'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'fedora-kinoite/**'
+      - '.github/workflows/fedora-kinoite-testing.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'fedora-kinoite/**'
+      - '.github/workflows/fedora-kinoite-testing.yml'
+  schedule:
+    - cron: '0 4 * * MON'
   workflow_dispatch:
     inputs:
       version:
@@ -119,9 +119,9 @@ jobs:
           image: ${{ env.NAME }}
           registry: ${{ env.REGISTRY }}
           tags: ${{ env.TAG }}
-          # extra-args: |
-          #   --compression-format=zstd
-          #   --compression-level=19
+          extra-args: |
+            --compression-format=zstd
+            --compression-level=19
 
       - name: Sign container image
         if: (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
