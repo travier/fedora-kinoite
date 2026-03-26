@@ -99,5 +99,14 @@ containerukifyargs=(--rootfs "${target}")
 bootc container ukify "${containerukifyargs[@]}" "${missing_verity[@]}" -- "${ukifyargs[@]}"
 EORUN
 
-FROM rootfs
-COPY --from=sealed-uki /out/*.efi /boot/EFI/Linux/
+FROM rootfs as pre-final
+RUN --mount=type=bind,from=sealed-uki,target=/_mount <<EORUN
+kver=$(cd /usr/lib/modules && echo *)
+mkdir -p /boot/EFI/Linux
+# We put the UKI in /boot for now due to composefs verity not being the
+# same due to mtime of /usr/lib/modules being changed
+cp /_mount/out/*.efi /boot/EFI/Linux
+EORUN
+
+FROM rootfs as final
+COPY --from=pre-final /boot /boot
