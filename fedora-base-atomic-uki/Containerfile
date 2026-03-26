@@ -16,6 +16,7 @@ rm -f "/etc/yum.repos.d/fedora-cisco-openh264.repo"
 # Install systemd-boot (will be replaced by the signed version later)
 dnf install -y fsverity-utils systemd-boot-unsigned
 dnf clean all
+rm -vrf "/var/cache/libdnf5" "/var/lib/dnf" "var/log/dnf5.log" "/var/cache/ldconfig" "/run/dnf"
 
 # Uninstall bootupd (no support for systemd-boot yet)
 rpm -e bootupd
