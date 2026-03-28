@@ -1,6 +1,6 @@
-FROM quay.io/fedora-ostree-desktops/base-atomic:43 as rootfs
+FROM quay.io/fedora-ostree-desktops/kinoite:43 as rootfs
 
-LABEL org.opencontainers.image.title="Fedora Base Atomic UKI"
+LABEL org.opencontainers.image.title="Fedora Kinoite UKI"
 LABEL org.opencontainers.image.source="https://github.com/travier/fedora-kinoite"
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL quay.expires-after=""
