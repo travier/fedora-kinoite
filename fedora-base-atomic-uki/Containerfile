@@ -5,7 +5,10 @@ LABEL org.opencontainers.image.source="https://github.com/travier/fedora-kinoite
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL quay.expires-after=""
 
-RUN <<EORUN
+RUN --mount=type=tmpfs,target=/run \
+    --mount=type=tmpfs,target=/tmp \
+    --mount=type=tmpfs,target=/var \
+    <<EORUN
 set -euo pipefail
 set -x
 
@@ -15,8 +18,6 @@ rm -f "/etc/yum.repos.d/fedora-cisco-openh264.repo"
 # Install fsverity utils to make it easier to check things
 # Install systemd-boot (will be replaced by the signed version later)
 dnf install -y fsverity-utils systemd-boot-unsigned
-dnf clean all
-rm -vrf "/var/cache/libdnf5" "/var/lib/dnf" "var/log/dnf5.log" "/var/cache/ldconfig" "/run/dnf"
 
 # Uninstall bootupd (no support for systemd-boot yet)
 rpm -e bootupd
@@ -50,13 +51,18 @@ EOF
 kver=$(cd "/usr/lib/modules" && echo *)
 dracut -vf --install "/etc/passwd /etc/group" "/usr/lib/modules/$kver/initramfs.img" "$kver"
 
-bootc container lint
+# Prepare folders in /boot
+mkdir -p /boot/EFI/Linux
 EORUN
 
 COPY /systemd-bootx64.efi /usr/lib/systemd/boot/efi/systemd-bootx64.efi
 
+FROM rootfs as lint
+RUN bootc container lint
+
 FROM quay.io/fedora-ostree-desktops/base-atomic:43 as sealed-uki
-RUN --mount=type=bind,from=rootfs,target=/target \
+RUN --mount=type=tmpfs,target=/run \
+    --mount=type=bind,from=rootfs-clean,src=/,target=/run/target \
     --mount=type=secret,id=secureboot_key \
     --mount=type=secret,id=secureboot_cert <<EORUN
 set -euo pipefail
@@ -69,11 +75,11 @@ rm -f "/etc/yum.repos.d/fedora-cisco-openh264.repo"
 dnf install -y systemd-ukify sbsigntools
 dnf clean all
 
-target="/target"
-output="/out"
+target="/run/target"
+output="/boot/EFI/Linux"
 secrets="/run/secrets"
 
-mkdir -p /out
+mkdir -p /boot/EFI/Linux
 
 # Find the kernel version (needed for output filename)
 kver=$(bootc container inspect --rootfs "${target}" --json | jq -r '.kernel.version')
@@ -100,14 +106,10 @@ containerukifyargs=(--rootfs "${target}")
 bootc container ukify "${containerukifyargs[@]}" "${missing_verity[@]}" -- "${ukifyargs[@]}"
 EORUN
 
-FROM rootfs as pre-final
+FROM rootfs-clean as pre-final
 RUN --mount=type=bind,from=sealed-uki,target=/_mount <<EORUN
-kver=$(cd /usr/lib/modules && echo *)
-mkdir -p /boot/EFI/Linux
-# We put the UKI in /boot for now due to composefs verity not being the
-# same due to mtime of /usr/lib/modules being changed
-cp /_mount/out/*.efi /boot/EFI/Linux
+cp -r /_mount/boot/* /boot/
 EORUN
 
-FROM rootfs as final
-COPY --from=pre-final /boot /boot
+FROM rootfs-clean as final
+COPY --from=pre-final /boot/EFI/Linux /boot/EFI/Linux
