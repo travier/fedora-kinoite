@@ -60,6 +60,14 @@ COPY /systemd-bootx64.efi /usr/lib/systemd/boot/efi/systemd-bootx64.efi
 FROM rootfs as lint
 RUN bootc container lint
 
+FROM scratch as rootfs-clean
+COPY --from=rootfs / /
+LABEL containers.bootc 1
+LABEL ostree.bootable 1
+ENV container=oci
+STOPSIGNAL SIGRTMIN+3
+CMD ["/sbin/init"]
+
 FROM quay.io/fedora-ostree-desktops/base-atomic:43 as sealed-uki
 RUN --mount=type=tmpfs,target=/run \
     --mount=type=bind,from=rootfs-clean,src=/,target=/run/target \
