@@ -1,4 +1,5 @@
-FROM quay.io/fedora-ostree-desktops/kinoite:43 as rootfs
+ARG BASE=quay.io/fedora-ostree-desktops/kinoite:44
+FROM $BASE as rootfs
 
 LABEL org.opencontainers.image.title="Fedora Kinoite UKI"
 LABEL org.opencontainers.image.source="https://github.com/travier/fedora-kinoite"
