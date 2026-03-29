@@ -22,7 +22,7 @@ dnf install -y fsverity-utils systemd-boot-unsigned
 
 # Install latest bootc release
 # https://bodhi.fedoraproject.org/updates/FEDORA-2026-cfa95147df
-dnf upgrade --enablerepo=updates-testing --refresh --advisory=FEDORA-2026-cfa95147df
+dnf upgrade -y --enablerepo=updates-testing --refresh --advisory=FEDORA-2026-cfa95147df
 
 # Uninstall bootupd (no support for systemd-boot yet)
 rpm -e bootupd
