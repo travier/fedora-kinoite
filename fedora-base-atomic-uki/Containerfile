@@ -88,7 +88,7 @@ ENV container=oci
 STOPSIGNAL SIGRTMIN+3
 CMD ["/sbin/init"]
 
-FROM quay.io/fedora-ostree-desktops/base-atomic:43 as sealed-uki
+FROM rootfs as sealed-uki
 RUN --mount=type=tmpfs,target=/run \
     --mount=type=bind,from=rootfs-clean,src=/,target=/run/target \
     --mount=type=secret,id=secureboot_key \
