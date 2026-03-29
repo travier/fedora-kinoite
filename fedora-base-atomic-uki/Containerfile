@@ -56,6 +56,9 @@ EOF
 kver=$(cd "/usr/lib/modules" && echo *)
 dracut -vf --install "/etc/passwd /etc/group" "/usr/lib/modules/$kver/initramfs.img" "$kver"
 
+# Enable sshd for bcvk
+systemctl enable sshd.service
+
 # Prepare folders in /boot
 mkdir -p /boot/EFI/Linux
 EORUN
