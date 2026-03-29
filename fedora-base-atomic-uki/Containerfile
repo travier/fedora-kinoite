@@ -59,6 +59,9 @@ dracut -vf --install "/etc/passwd /etc/group" "/usr/lib/modules/$kver/initramfs.
 # Enable sshd for bcvk
 systemctl enable sshd.service
 
+# Disable root password for development
+passwd -d root
+
 # Prepare folders in /boot
 mkdir -p /boot/EFI/Linux
 EORUN
