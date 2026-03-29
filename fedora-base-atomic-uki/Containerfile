@@ -64,15 +64,24 @@ passwd -d root
 
 # Prepare folders in /boot
 mkdir -p /boot/EFI/Linux
+
+# Get rid of /ostree folder for chunkah
+rm -rf /sysroot/ostree /ostree
 EORUN
 
 COPY /systemd-bootx64.efi /usr/lib/systemd/boot/efi/systemd-bootx64.efi
 
 FROM rootfs as lint
-RUN bootc container lint
+RUN bootc container lint --skip baseimage-root
 
-FROM scratch as rootfs-clean
-COPY --from=rootfs / /
+FROM quay.io/coreos/chunkah AS chunkah
+RUN --mount=from=rootfs,src=/,target=/chunkah,ro \
+    --mount=type=bind,target=/run/src,rw \
+        chunkah build > /run/src/out.ociarchive
+
+FROM oci-archive:out.ociarchive as rootfs-clean
+# FROM scratch as rootfs-clean
+# COPY --from=rootfs / /
 LABEL containers.bootc 1
 LABEL ostree.bootable 1
 ENV container=oci
