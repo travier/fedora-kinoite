@@ -67,11 +67,13 @@ COPY /systemd-bootx64.efi /usr/lib/systemd/boot/efi/systemd-bootx64.efi
 FROM rootfs as lint
 RUN bootc container lint
 
+# Use more layers (128)
 # Ignore legacy ostree folders
 FROM quay.io/coreos/chunkah AS chunkah
 RUN --mount=from=rootfs,src=/,target=/chunkah,ro \
     --mount=type=bind,target=/run/src,rw \
         chunkah build \
+            --max-layers 128 \
             --prune /ostree \
             --prune /sysroot/ostree \
             > /run/src/out.ociarchive
