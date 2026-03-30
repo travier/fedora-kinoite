@@ -85,8 +85,6 @@ RUN --mount=from=rootfs,src=/,target=/chunkah,ro \
             > /run/src/out.ociarchive
 
 FROM oci-archive:out.ociarchive as rootfs-clean
-# FROM scratch as rootfs-clean
-# COPY --from=rootfs / /
 LABEL containers.bootc 1
 LABEL ostree.bootable 1
 LABEL org.opencontainers.image.title="Fedora Kinoite UKI"
