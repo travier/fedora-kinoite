@@ -143,10 +143,5 @@ containerukifyargs=(--rootfs "${target}")
 bootc container ukify "${containerukifyargs[@]}" "${missing_verity[@]}" -- "${ukifyargs[@]}"
 EORUN
 
-FROM rootfs-clean as pre-final
-RUN --mount=type=bind,from=sealed-uki,target=/_mount <<EORUN
-cp -r /_mount/boot/* /boot/
-EORUN
-
 FROM rootfs-clean as final
-COPY --from=pre-final /boot/EFI/Linux /boot/EFI/Linux
+COPY --from=sealed-uki /boot/EFI/Linux /boot/EFI/Linux
