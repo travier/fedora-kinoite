@@ -1,11 +1,6 @@
 ARG BASE=quay.io/fedora-ostree-desktops/kinoite:44.20260330.0
 FROM $BASE as rootfs
 
-LABEL org.opencontainers.image.title="Fedora Kinoite UKI"
-LABEL org.opencontainers.image.source="https://github.com/travier/fedora-kinoite"
-LABEL org.opencontainers.image.licenses="MIT"
-LABEL quay.expires-after=""
-
 RUN --mount=type=tmpfs,target=/run \
     --mount=type=tmpfs,target=/tmp \
     --mount=type=tmpfs,target=/var \
@@ -84,6 +79,9 @@ FROM oci-archive:out.ociarchive as rootfs-clean
 # COPY --from=rootfs / /
 LABEL containers.bootc 1
 LABEL ostree.bootable 1
+LABEL org.opencontainers.image.title="Fedora Kinoite UKI"
+LABEL org.opencontainers.image.source="https://github.com/travier/fedora-kinoite"
+LABEL org.opencontainers.image.licenses="MIT"
 ENV container=oci
 STOPSIGNAL SIGRTMIN+3
 CMD ["/sbin/init"]
