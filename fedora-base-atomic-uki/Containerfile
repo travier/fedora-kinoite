@@ -33,7 +33,7 @@ rm -vrf "/usr/lib/bootupd/updates"
 cat > "/usr/lib/bootc/kargs.d/10-rootfs-kargs.toml" << 'EOF'
 # Mount the root filesystem read-write
 # Enable btrfs compression
-kargs = ["rw", "rootflags=subvol=root,compress=zstd:1"]
+kargs = ["rw", "rootflags=compress=zstd:1"]
 EOF
 
 # Default to btrfs
