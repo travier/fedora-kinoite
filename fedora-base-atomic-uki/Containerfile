@@ -1,4 +1,4 @@
-ARG BASE=quay.io/fedora-ostree-desktops/kinoite:44
+ARG BASE=quay.io/fedora-ostree-desktops/kinoite:44.20260330.0
 FROM $BASE as rootfs
 
 LABEL org.opencontainers.image.title="Fedora Kinoite UKI"
