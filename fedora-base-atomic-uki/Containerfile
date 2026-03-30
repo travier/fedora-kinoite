@@ -92,6 +92,7 @@ CMD ["/sbin/init"]
 
 FROM rootfs as sealed-uki
 RUN --mount=type=tmpfs,target=/run \
+    --mount=type=tmpfs,target=/var/tmp \
     --mount=type=bind,from=rootfs-clean,src=/,target=/run/target \
     --mount=type=secret,id=secureboot_key \
     --mount=type=secret,id=secureboot_cert <<EORUN
