@@ -7,20 +7,20 @@ env:
   TAG: "testing"
 
 on:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'fedora-kinoite/**'
-      - '.github/workflows/fedora-kinoite-testing.yml'
-  push:
-    branches:
-      - main
-    paths:
-      - 'fedora-kinoite/**'
-      - '.github/workflows/fedora-kinoite-testing.yml'
-  schedule:
-    - cron: '0 4 * * MON'
+  # pull_request:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'fedora-kinoite/**'
+  #     - '.github/workflows/fedora-kinoite-testing.yml'
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'fedora-kinoite/**'
+  #     - '.github/workflows/fedora-kinoite-testing.yml'
+  # schedule:
+  #   - cron: '0 4 * * MON'
   workflow_dispatch:
     inputs:
       version:
