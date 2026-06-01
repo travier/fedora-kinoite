@@ -1,3 +1,13 @@
+# No longer maintained
+
+I've moved back to using the default bootable container images we produce in
+Fedora and focusing on adding content to the base image via sysexts instead:
+<https://github.com/fedora-sysexts>
+
+Original README below for reference.
+
+---
+
 # Custom Fedora Kinoite images
 
 This repository hosts Containerfiles and GitHub workflows to create custom
